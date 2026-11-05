@@ -1,6 +1,6 @@
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize('mysql://root:526481200@localhost:3306/TPI');
+const sequelize = new Sequelize('mysql://root:123456@localhost:3306/TPI');
 
 const Producto = require('./producto')(sequelize);
 const Venta = require('./venta')(sequelize);

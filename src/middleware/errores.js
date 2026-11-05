@@ -1,17 +1,17 @@
-const manejadorErrores = (error, peticion, respuesta, siguiente) => {
+const manejadorErrores = (error, req, res, next) => {
     console.error(error.stack);
 
     const codigoEstado = error.status || 500;
     const mensaje = error.message || 'Error interno del servidor';
 
-    if (peticion.originalUrl.startsWith('/api')) {
-        return respuesta.status(codigoEstado).json({
+    if (req.originalUrl.startsWith('/api')) {
+        return res.status(codigoEstado).json({
             error: true,
             mensaje: mensaje
         });
     }
 
-    respuesta.status(codigoEstado).render('error', {
+    res.status(codigoEstado).render('error', {
         mensaje: mensaje,
         estado: codigoEstado
     });
