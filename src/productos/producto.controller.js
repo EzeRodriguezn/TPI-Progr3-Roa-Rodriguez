@@ -9,6 +9,8 @@ const crearProducto = async (req, res) => {
     nombre: nombre,
     precio: precio,
     stock: stock,
+    categoria: categoria,
+    subcategoria: subcategoria,
   });
 
   res.send(productoCreado);
@@ -44,6 +46,13 @@ const modificarProductoPorId = async (req, res) => {
   // Usamos !== undefined por si queremos mandar un stock de 0
   if (stock !== undefined) {
     datosAModificar.stock = stock;
+  }
+  
+  if (categoria) {
+    datosAModificar.categoria = categoria;
+  }
+  if (subcategoria) {
+    datosAModificar.subcategoria = subcategoria;
   }
 
   const modificado = await Producto.update(datosAModificar, {

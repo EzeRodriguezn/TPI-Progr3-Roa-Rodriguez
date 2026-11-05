@@ -21,8 +21,13 @@ const Producto = sequelize.define(
       type: DataTypes.INTEGER,
       defaultValue: 0,
     },
+    categoria: {
+      type: DataTypes.STRING, //periféricos o sillas
+    },
+    subcategoria: {
+      type: DataTypes.STRING, //teclado, "sillas gamer", etc
   },
-  {
+  
     tableName: "productos",
   }
 );
