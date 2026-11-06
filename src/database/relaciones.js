@@ -1,23 +1,34 @@
-// 1. Importamos la instancia de conexión a la base de datos
-const sequelize = require('./sequelize');
+const Usuario = require("../usuarios/usuario.model");
+const Venta = require("../ventas/venta.model");
+const Producto = require("../productos/producto.model");
+const sequelize = require("./sequelize");
+const ProductoVentas = require("./ProductoVentas.model");
 
-// 2. Importamos e inicializamos los modelos desde sus respectivos módulos
-const Producto = require('../productos/producto.model')(sequelize);
-const Venta = require('../ventas/venta.model')(sequelize);
-const Usuario = require('../usuarios/usuario.model')(sequelize);
+// UNO A MUCHOS (Un Usuario/Cajero registra muchas Ventas)
+Usuario.hasMany(Venta, {
+  foreignKey: "idUsuario",
+  onDelete: "RESTRICT",
+  onUpdate: "CASCADE",
+});
+Venta.belongsTo(Usuario, {
+  foreignKey: "idUsuario",
+  onDelete: "RESTRICT",
+  onUpdate: "CASCADE",
+});
 
-// (Opcional) Si configuraste el modelo intermedio explícitamente:
-// const ProductoVenta = require('./ProductosVentas-model')(sequelize);
+// MUCHO A MUCHOS (Ventas y Productos a través de la tabla intermedia ProductoVentas)
+Venta.belongsToMany(Producto, { through: ProductoVentas });
+Producto.belongsToMany(Venta, { through: ProductoVentas });
 
-// 3. Definimos las relaciones (Muchos a Muchos)
-// Si no usás el archivo ProductosVentas-model.js, Sequelize crea la tabla 'producto_venta' automáticamente
-Producto.belongsToMany(Venta, { through: 'producto_venta', timestamps: false });
-Venta.belongsToMany(Producto, { through: 'producto_venta', timestamps: false });
+async function syncMuchos() {
+  await sequelize.sync({ alter: true });
+}
 
-// 4. Exportamos los modelos y la conexión listos para usar en los controladores
+syncMuchos();
+
 module.exports = {
-    sequelize,
-    Producto,
-    Venta,
-    Usuario
+  Usuario,
+  Venta,
+  Producto,
+  ProductoVentas,
 };
