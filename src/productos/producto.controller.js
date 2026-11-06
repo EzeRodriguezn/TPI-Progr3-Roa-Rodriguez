@@ -52,7 +52,7 @@ const crearProducto = async (req, res) => {
       categoria,
       subcategoria,
       imagen,
-      activo: true // El TP pide que nazcan activos
+      activo: true 
     });
 
     // Redirigimos al listado después de crear
@@ -63,7 +63,7 @@ const crearProducto = async (req, res) => {
   }
 };
 
-// 5. Procesar la modificación del producto
+
 const modificarProductoPorId = async (req, res) => {
   try {
     // Agregamos categoria y subcategoria que faltaban desestructurar del req.body
@@ -94,7 +94,7 @@ const modificarProductoPorId = async (req, res) => {
   }
 };
 
-// 6. Baja lógica (El TP pide que no se eliminen de la base de datos)
+
 const desactivarProducto = async (req, res) => {
   try {
     await Producto.update({ activo: false }, { where: { id: req.params.id } });
@@ -105,7 +105,7 @@ const desactivarProducto = async (req, res) => {
   }
 };
 
-// 7. Reactivar producto
+
 const reactivarProducto = async (req, res) => {
   try {
     await Producto.update({ activo: true }, { where: { id: req.params.id } });

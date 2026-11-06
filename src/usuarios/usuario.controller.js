@@ -5,7 +5,6 @@ const crearUsuario = async (req, res) => {
   // Desestructuramos para mayor seguridad 
   const { username, password, rol } = req.body;
 
-  // Más adelante, archivo utils/hash.js para encriptar la contraseña
   const usuarioCreado = await Usuario.create({
     username: username,
     password: password,

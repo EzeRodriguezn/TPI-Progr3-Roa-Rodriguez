@@ -12,7 +12,6 @@ const crearVenta = async (req, res) => {
   res.send(ventaCreada);
 };
 
-// Esta es tu versión de "crearEstCurso" para la tabla intermedia
 const agregarProductoVenta = async (req, res) => {
   const { idVenta, idProducto, cantidad, precio_historico } = req.body;
 
