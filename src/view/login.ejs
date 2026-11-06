@@ -1,1 +1,45 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Administrador - Autoservicio</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; margin: 0; }
+        .login-container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 320px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .btn-ingresar { background-color: #28a745; color: white; }
+        .btn-tester { background-color: #007bff; color: white; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Panel Administrador</h2>
+        
+        <!-- El form apunta al endpoint de login que va a procesar los datos -->
+        <form action="/usuarios/login" method="POST">
+            <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" name="password" placeholder="Contraseña" required>
+            <button type="submit" class="btn-ingresar">Ingresar</button>
+        </form>
+
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+        <!-- Botón de acceso rápido exigido por la cátedra -->
+        <button type="button" class="btn-tester" id="btn-tester">Acceso Rápido Profesores</button>
+    </div>
+
+    <script>
+        // Lógica del botón para autocompletar los inputs
+        document.getElementById('btn-tester').addEventListener('click', () => {
+            // Asegurate de cambiar estos datos por un usuario admin real de tu base de datos
+            document.getElementById('email').value = 'admin@admin.com';
+            document.getElementById('password').value = '123456';
+        });
+    </script>
+
+</body>
+</html>
