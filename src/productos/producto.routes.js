@@ -1,30 +1,25 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database/sequelize");
+const express = require("express");
+const router = express.Router();
+const subidaArchivos = require("../middleware/subidaArchivos");
+const {
+  traerProductos,
+  mostrarFormularioNuevo,
+  mostrarFormularioEdicion,
+  crearProducto,
+  modificarProductoPorId,
+  desactivarProducto,
+  reactivarProducto,
+} = require("./producto.controller");
 
-const Producto = sequelize.define(
-  "Producto",
-  {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    nombre: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    precio: {
-      type: DataTypes.DECIMAL(10, 2), // 10 dígitos en total, 2 decimales
-      allowNull: false,
-    },
-    stock: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0,
-    },
-  },
-  {
-    tableName: "productos",
-  }
-);
+// RUTAS GET (Para mostrar las pantallas HTML del administrador)
+router.get("/", traerProductos);
+router.get("/nuevo", mostrarFormularioNuevo);
+router.get("/editar/:id", mostrarFormularioEdicion);
 
-module.exports = Producto;
+// RUTAS POST (Para enviar los datos de los formularios y ejecutar acciones)
+router.post("/nuevo", subidaArchivos.single("imagen"), crearProducto);
+router.post("/editar/:id", subidaArchivos.single("imagen"), modificarProductoPorId);
+router.post("/desactivar/:id", desactivarProducto);
+router.post("/reactivar/:id", reactivarProducto);
+
+module.exports = router;

@@ -20,7 +20,9 @@ app.use("/public", express.static("public"));
 // Configuración de EJS para tus vistas (agregado para el TPI)
 // Configuración de EJS para tus vistas
 app.set("view engine", "ejs");
-app.set("views", "./src/view"); // <-- Acá le indicás que la carpeta se llama "view"
+app.set("views", "./src/view"); 
+
+
 app.use(
   cors({
     origin: "http://127.0.0.1:5500",
@@ -33,8 +35,14 @@ app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
 
+// Ruta para mostrar la vista del login HTML
 app.get("/login", (req, res) => {
   res.render("login");
+});
+
+// Ruta para mostrar el panel principal (Dashboard)
+app.get("/dashboard", (req, res) => {
+  res.render("index"); // Busca index.ejs en la carpeta view
 });
 
 // --- AGREGADO: Middleware de manejo de errores global (Punto 8) ---
