@@ -18,9 +18,9 @@ app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
 // Configuración de EJS para tus vistas (agregado para el TPI)
+// Configuración de EJS para tus vistas
 app.set("view engine", "ejs");
-app.set("views", "./src/views");
-
+app.set("views", "./src/view"); // <-- Acá le indicás que la carpeta se llama "view"
 app.use(
   cors({
     origin: "http://127.0.0.1:5500",
