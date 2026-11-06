@@ -27,6 +27,14 @@ const Producto = sequelize.define(
     subcategoria: {
       type: DataTypes.STRING,
     },
+    imagen: {
+      type: DataTypes.STRING,
+      defaultValue: 'default.png', // Por si alguna vez se carga sin imagen
+    },
+    activo: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true, // Todos los productos nacen activos por defecto
+    }
   },
   {
     tableName: "productos",

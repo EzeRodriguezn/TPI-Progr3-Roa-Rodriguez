@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof producto !== 'undefined' ? 'Editar Producto' : 'Alta de Producto' %></title>
+    <style>
+        body { margin: 0; font-family: Arial, sans-serif; background-color: #f4f4f4; }
+        .container { padding: 20px; max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+
+    <%- include('../nav') %>
+
+    <div class="container">
+        <h2><%= typeof producto !== 'undefined' ? 'Editar Producto #' + producto.id : 'Cargar Nuevo Producto' %></h2>
+        
+        <!-- Si existe "producto", el form envía los datos a editar. Si no, los envía a crear -->
+        <form action="<%= typeof producto !== 'undefined' ? '/productos/editar/' + producto.id : '/productos/nuevo' %>" method="POST" enctype="multipart/form-data">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre del Producto:</label>
+                <input type="text" id="nombre" name="nombre" value="<%= typeof producto !== 'undefined' ? producto.nombre : '' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" step="0.01" value="<%= typeof producto !== 'undefined' ? producto.precio : '' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="stock">Stock:</label>
+                <input type="number" id="stock" name="stock" value="<%= typeof producto !== 'undefined' ? producto.stock : '0' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="categoria">Categoría:</label>
+                <input type="text" id="categoria" name="categoria" value="<%= typeof producto !== 'undefined' ? producto.categoria : '' %>" required>
+            </div>
+
+            <div class="form-group">
+                <label for="subcategoria">Subcategoría:</label>
+                <input type="text" id="subcategoria" name="subcategoria" value="<%= typeof producto !== 'undefined' ? producto.subcategoria : '' %>">
+            </div>
+
+            <div class="form-group">
+                <label for="imagen">Imagen del Producto:</label>
+                <!-- Al editar, la imagen nueva es opcional. Al crear, es obligatoria -->
+                <input type="file" id="imagen" name="imagen" accept="image/*" <%= typeof producto !== 'undefined' ? '' : 'required' %>>
+            </div>
+
+            <button type="submit"><%= typeof producto !== 'undefined' ? 'Guardar Cambios' : 'Crear Producto' %></button>
+        </form>
+    </div>
+
+</body>
+</html>
