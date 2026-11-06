@@ -33,6 +33,10 @@ app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
 
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
 // --- AGREGADO: Middleware de manejo de errores global (Punto 8) ---
 // Tiene que ir acá, después de las rutas y antes de levantar el servidor
 app.use((err, req, res, next) => {
