@@ -5,9 +5,20 @@ const {
   modificarUsuarioPorId,
   traerUsuarios,
   traerUsuarioPorId,
+  procesarLogin, 
+  cerrarSesion   
 } = require("./usuario.controller");
 
+
+const { validarLogin } = require("../middleware/validarLogin");
+
 const usuarioRouter = express.Router();
+
+
+usuarioRouter.post("/login", validarLogin, procesarLogin);
+usuarioRouter.get("/logout", cerrarSesion);
+
+
 
 usuarioRouter.get("/", traerUsuarios);
 
