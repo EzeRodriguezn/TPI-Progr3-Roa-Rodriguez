@@ -2,20 +2,23 @@ const { Op } = require("sequelize");
 const { Producto } = require("../database/relaciones");
 
 const crearProducto = async (req, res) => {
-  // Desestructuramos los campos exactos del modelo Producto
-  const { nombre, precio, stock } = req.body;
+  try {
+    const { nombre, precio, stock, categoria, subcategoria } = req.body;
 
-  const productoCreado = await Producto.create({
-    nombre: nombre,
-    precio: precio,
-    stock: stock,
-    categoria: categoria,
-    subcategoria: subcategoria,
-  });
+    const productoCreado = await Producto.create({
+      nombre,
+      precio,
+      stock,
+      categoria,
+      subcategoria,
+    });
 
-  res.send(productoCreado);
+    res.status(201).json(productoCreado);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al crear el producto" });
+  }
 };
-
 const traerProductos = async (req, res) => {
   // Ordenamos alfabéticamente por nombre del producto
   const productos = await Producto.findAll({ order: [["nombre", "ASC"]] });

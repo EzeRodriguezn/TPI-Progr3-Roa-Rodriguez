@@ -14,7 +14,7 @@ const Producto = sequelize.define(
       allowNull: false,
     },
     precio: {
-      type: DataTypes.DECIMAL(10, 2), 
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
     stock: {
@@ -22,12 +22,13 @@ const Producto = sequelize.define(
       defaultValue: 0,
     },
     categoria: {
-      type: DataTypes.STRING, //periféricos o sillas
+      type: DataTypes.STRING,
     },
     subcategoria: {
-      type: DataTypes.STRING, //teclado, "sillas gamer", etc
+      type: DataTypes.STRING,
+    },
   },
-  
+  {
     tableName: "productos",
   }
 );
