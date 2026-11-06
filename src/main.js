@@ -17,9 +17,11 @@ app.use(express.json());
 app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
-// Configuración de EJS para tus vistas (agregado para el TPI)
+// Configuración de EJS para tus vistas 
+// Configuración de EJS para tus vistas
 app.set("view engine", "ejs");
-app.set("views", "./src/views");
+app.set("views", "./src/view"); 
+
 
 app.use(
   cors({
@@ -33,14 +35,23 @@ app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
 
-// --- AGREGADO: Middleware de manejo de errores global (Punto 8) ---
-// Tiene que ir acá, después de las rutas y antes de levantar el servidor
+// Ruta para mostrar la vista del login HTML
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+// Ruta para mostrar el panel principal (Dashboard)
+app.get("/dashboard", (req, res) => {
+  res.render("index"); // Busca index.ejs en la carpeta view
+});
+
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send({ error: "Ocurrió un error en el servidor" });
 });
 
-// 5. Conectar la instancia al puerto elegido y a la BD
+
 const PORT = 3000;
 
 sequelize.authenticate()

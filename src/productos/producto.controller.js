@@ -1,80 +1,127 @@
 const { Op } = require("sequelize");
 const { Producto } = require("../database/relaciones");
 
+// 1. Mostrar la tabla con todos los productos (Renderiza EJS)
+const traerProductos = async (req, res) => {
+  try {
+    // Ordenamos alfabéticamente por nombre del producto
+    const productos = await Producto.findAll({ order: [["nombre", "ASC"]] });
+    
+    // Conecta con src/view/productos/listado.ejs pasándole los datos
+    res.render("productos/listado", { productos });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al cargar los productos");
+  }
+};
+
+// 2. Mostrar el formulario vacío para crear (Renderiza EJS)
+const mostrarFormularioNuevo = (req, res) => {
+  res.render("productos/formulario");
+};
+
+// 3. Mostrar el formulario con los datos cargados para editar (Renderiza EJS)
+const mostrarFormularioEdicion = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const producto = await Producto.findByPk(id);
+    
+    if (!producto) {
+      return res.status(404).send("Producto no encontrado");
+    }
+    
+    res.render("productos/formulario", { producto });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al cargar el producto");
+  }
+};
+
+// 4. Procesar la creación del producto
 const crearProducto = async (req, res) => {
   try {
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
+    
+    // Atrapamos la imagen procesada por Multer, o ponemos una por defecto
+    const imagen = req.file ? req.file.filename : 'default.png';
 
-    const productoCreado = await Producto.create({
+    await Producto.create({
       nombre,
       precio,
       stock,
       categoria,
       subcategoria,
+      imagen,
+      activo: true 
     });
 
-    res.status(201).json(productoCreado);
+    // Redirigimos al listado después de crear
+    res.redirect("/productos");
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error al crear el producto" });
+    res.status(500).send("Error al crear el producto");
   }
 };
-const traerProductos = async (req, res) => {
-  // Ordenamos alfabéticamente por nombre del producto
-  const productos = await Producto.findAll({ order: [["nombre", "ASC"]] });
 
-  res.send(productos);
-};
-
-const traerProductoPorId = async (req, res) => {
-  const id = req.params.id;
-
-  const producto = await Producto.findByPk(id);
-
-  res.send(producto);
-};
 
 const modificarProductoPorId = async (req, res) => {
-  const { nombre, precio, stock } = req.body;
-  const { id } = req.params;
+  try {
+    // Agregamos categoria y subcategoria que faltaban desestructurar del req.body
+    const { nombre, precio, stock, categoria, subcategoria } = req.body;
+    const { id } = req.params;
 
-  let datosAModificar = {};
+    let datosAModificar = {};
 
-  if (nombre) {
-    datosAModificar.nombre = nombre;
-  }
-  if (precio) {
-    datosAModificar.precio = precio;
-  }
-  // Usamos !== undefined por si queremos mandar un stock de 0
-  if (stock !== undefined) {
-    datosAModificar.stock = stock;
-  }
-  
-  if (categoria) {
-    datosAModificar.categoria = categoria;
-  }
-  if (subcategoria) {
-    datosAModificar.subcategoria = subcategoria;
-  }
+    if (nombre) datosAModificar.nombre = nombre;
+    if (precio) datosAModificar.precio = precio;
+    if (stock !== undefined) datosAModificar.stock = stock;
+    if (categoria) datosAModificar.categoria = categoria;
+    if (subcategoria) datosAModificar.subcategoria = subcategoria;
 
-  const modificado = await Producto.update(datosAModificar, {
-    where: { id },
-  });
+    // Si el usuario subió una imagen nueva, la pisamos
+    if (req.file) {
+      datosAModificar.imagen = req.file.filename;
+    }
 
-  res.send(modificado);
+    await Producto.update(datosAModificar, {
+      where: { id },
+    });
+
+    res.redirect("/productos");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al modificar el producto");
+  }
 };
 
-const eliminarProductoPorId = async (req, res) => {
-  const eliminado = await Producto.destroy({ where: { id: req.params.id } });
 
-  res.send(eliminado);
+const desactivarProducto = async (req, res) => {
+  try {
+    await Producto.update({ activo: false }, { where: { id: req.params.id } });
+    res.redirect("/productos");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al desactivar el producto");
+  }
+};
+
+
+const reactivarProducto = async (req, res) => {
+  try {
+    await Producto.update({ activo: true }, { where: { id: req.params.id } });
+    res.redirect("/productos");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al reactivar el producto");
+  }
 };
 
 module.exports = {
-  crearProducto,
   traerProductos,
-  traerProductoPorId,
+  mostrarFormularioNuevo,
+  mostrarFormularioEdicion,
+  crearProducto,
   modificarProductoPorId,
-  eliminarProductoPorId,
+  desactivarProducto,
+  reactivarProducto,
 };
