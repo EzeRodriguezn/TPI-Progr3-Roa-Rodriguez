@@ -3,7 +3,7 @@ const path = require('path');
 
 const almacenamiento = multer.diskStorage({
     destination: (peticion, archivo, callback) => {
-        callback(null, path.join(__dirname, '../../public/uploads'));
+        callback(null, path.join(__dirname, '../../public/descargas'));
     },
     filename: (peticion, archivo, callback) => {
         const sufijoUnico = Date.now() + '-' + Math.round(Math.random() * 1E9);
