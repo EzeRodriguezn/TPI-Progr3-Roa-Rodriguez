@@ -11,6 +11,7 @@
         button { width: 100%; padding: 10px; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         .btn-ingresar { background-color: #28a745; color: white; }
         .btn-tester { background-color: #007bff; color: white; margin-top: 20px; }
+        .alerta-error { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
@@ -18,8 +19,15 @@
     <div class="login-container">
         <h2>Acceso Administrador</h2>
         
+        <% if (typeof error !== 'undefined') { %>
+            <div class="alerta-error">
+                <%= error %>
+            </div>
+        <% } %>
+        
         <form action="/usuarios/login" method="POST">
-            <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+            
+            <input type="text" id="username" name="username" placeholder="Correo electrónico o Usuario" required>
             <input type="password" id="password" name="password" placeholder="Contraseña" required>
             <button type="submit" class="btn-ingresar">Ingresar</button>
         </form>
@@ -31,7 +39,8 @@
 
     <script>
         document.getElementById('btn-tester').addEventListener('click', () => {
-            document.getElementById('email').value = 'admin@admin.com';
+          
+            document.getElementById('username').value = 'admin@admin.com'; 
             document.getElementById('password').value = '123456';
         });
     </script>
