@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -17,9 +16,8 @@
 <body>
 
     <div class="login-container">
-        <h2>Panel Administrador</h2>
+        <h2>Acceso Administrador</h2>
         
-        <!-- El form apunta al endpoint de login que va a procesar los datos -->
         <form action="/usuarios/login" method="POST">
             <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
             <input type="password" id="password" name="password" placeholder="Contraseña" required>
@@ -28,14 +26,11 @@
 
         <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
 
-        <!-- Botón de acceso rápido exigido por la cátedra -->
         <button type="button" class="btn-tester" id="btn-tester">Acceso Rápido Profesores</button>
     </div>
 
     <script>
-        // Lógica del botón para autocompletar los inputs
         document.getElementById('btn-tester').addEventListener('click', () => {
-            // Asegurate de cambiar estos datos por un usuario admin real de tu base de datos
             document.getElementById('email').value = 'admin@admin.com';
             document.getElementById('password').value = '123456';
         });
