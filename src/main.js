@@ -33,12 +33,19 @@ app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
 
+// --- AGREGADO: Middleware de manejo de errores global (Punto 8) ---
+// Tiene que ir acá, después de las rutas y antes de levantar el servidor
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ error: "Ocurrió un error en el servidor" });
+});
+
 // 5. Conectar la instancia al puerto elegido y a la BD
 const PORT = 3000;
 
 sequelize.authenticate()
   .then(() => {
-    console.log("¡Conexión a la base de datos establecida correctamente!");
+    console.log("Conexion establecida!!");
     app.listen(PORT, () => {
       console.log(`El server inició correctamente en el puerto ${PORT}`);
     });

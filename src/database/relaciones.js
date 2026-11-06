@@ -2,7 +2,7 @@ const Usuario = require("../usuarios/usuario.model");
 const Venta = require("../ventas/venta.model");
 const Producto = require("../productos/producto.model");
 const sequelize = require("./sequelize");
-const ProductoVentas = require("./ProductoVentas.model");
+const ProductoVentas = require("./ProductosVentas.model");
 
 // UNO A MUCHOS (Un Usuario/Cajero registra muchas Ventas)
 Usuario.hasMany(Venta, {
