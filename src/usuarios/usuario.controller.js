@@ -5,14 +5,13 @@ const bcrypt = require("bcryptjs");
 const crearUsuario = async (req, res) => {
   const { username, password, rol } = req.body;
 
-  // IMPORTANTE: Para que el login funcione con bcrypt, la contraseña debe guardarse encriptada.
-  // Descomentá estas dos líneas cuando vayas a crear un usuario nuevo:
-  // const salt = await bcrypt.genSalt(10);
-  // const passwordHasheada = await bcrypt.hash(password, salt);
+  // 1. Encriptamos la clave recibida antes de guardarla
+  const salt = await bcrypt.genSalt(10);
+  const passwordHasheada = await bcrypt.hash(password, salt);
 
   const usuarioCreado = await Usuario.create({
     username: username,
-    password: password, // Cambialo a 'passwordHasheada' cuando actives lo de arriba
+    password: passwordHasheada, // Guardamos la contraseña encriptada
     rol: rol,
   });
 
@@ -37,7 +36,11 @@ const modificarUsuarioPorId = async (req, res) => {
   let datosAModificar = {};
 
   if (username) datosAModificar.username = username;
-  if (password) datosAModificar.password = password; 
+  if (password) {
+    // Si desde Postman intentan modificar la clave, también hay que encriptarla
+    const salt = await bcrypt.genSalt(10);
+    datosAModificar.password = await bcrypt.hash(password, salt);
+  }
   if (rol) datosAModificar.rol = rol;
 
   const modificado = await Usuario.update(datosAModificar, {
@@ -55,19 +58,19 @@ const eliminarUsuarioPorId = async (req, res) => {
 const procesarLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     const usuario = await Usuario.findOne({ where: { username } });
     if (!usuario) {
       return res.render("login", { error: "Credenciales incorrectas" });
     }
 
+    // Compara la contraseña que llega del formulario con la encriptada de la BD
     const passwordValida = await bcrypt.compare(password, usuario.password);
     if (!passwordValida) {
       return res.render("login", { error: "Credenciales incorrectas" });
     }
 
-    // MANDAMOS UNA COOKIE MANUAL AL NAVEGADOR
-    // Nombre: adminLogueado | Valor: true | Expira: en 1 día (en milisegundos)
+    // Usamos cookies nativas de Express en lugar de express-session
     res.cookie("adminLogueado", "true", { maxAge: 1000 * 60 * 60 * 24 });
 
     res.redirect("/dashboard");
