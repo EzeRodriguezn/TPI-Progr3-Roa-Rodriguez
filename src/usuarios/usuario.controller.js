@@ -5,9 +5,14 @@ const bcrypt = require("bcryptjs");
 const crearUsuario = async (req, res) => {
   const { username, password, rol } = req.body;
 
+  // IMPORTANTE: Para que el login funcione con bcrypt, la contraseña debe guardarse encriptada.
+  // Descomentá estas dos líneas cuando vayas a crear un usuario nuevo:
+  // const salt = await bcrypt.genSalt(10);
+  // const passwordHasheada = await bcrypt.hash(password, salt);
+
   const usuarioCreado = await Usuario.create({
     username: username,
-    password: password, 
+    password: password, // Cambialo a 'passwordHasheada' cuando actives lo de arriba
     rol: rol,
   });
 
@@ -49,13 +54,10 @@ const eliminarUsuarioPorId = async (req, res) => {
 
 const procesarLogin = async (req, res) => {
   try {
-   
     const { username, password } = req.body;
-
     
     const usuario = await Usuario.findOne({ where: { username } });
     if (!usuario) {
-      
       return res.render("login", { error: "Credenciales incorrectas" });
     }
 
@@ -64,10 +66,9 @@ const procesarLogin = async (req, res) => {
       return res.render("login", { error: "Credenciales incorrectas" });
     }
 
-    req.session.usuarioLogueado = true;
-    req.session.usuarioId = usuario.id;
-    req.session.username = usuario.username;
-    req.session.rol = usuario.rol;
+    // MANDAMOS UNA COOKIE MANUAL AL NAVEGADOR
+    // Nombre: adminLogueado | Valor: true | Expira: en 1 día (en milisegundos)
+    res.cookie("adminLogueado", "true", { maxAge: 1000 * 60 * 60 * 24 });
 
     res.redirect("/dashboard");
 
@@ -78,11 +79,9 @@ const procesarLogin = async (req, res) => {
 };
 
 const cerrarSesion = (req, res) => {
-  
-  req.session.destroy((err) => {
-    if (err) console.error("Error al cerrar sesión:", err);
-    res.redirect("/login");
-  });
+  // Borramos la cookie para desloguear al usuario
+  res.clearCookie("adminLogueado");
+  res.redirect("/login");
 };
 
 module.exports = {
@@ -92,5 +91,5 @@ module.exports = {
   modificarUsuarioPorId,
   eliminarUsuarioPorId,
   procesarLogin,
-  cerrarSesion
-};
+  cerrarSesion,
+}
