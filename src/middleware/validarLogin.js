@@ -1,8 +1,8 @@
 const { z } = require("zod");
 
 const esquemaLogin = z.object({
-  email: z.string({ required_error: "El email es obligatorio" }).email("El formato del correo no es válido"),
-  password: z.string({ required_error: "La contraseña es obligatoria" }).min(1, "La contraseña no puede estar vacía")
+  username: z.string().min(1, "El usuario es obligatorio"),
+  password: z.string().min(1, "La contraseña no puede estar vacía")
 });
 
 const validarLogin = (req, res, next) => {
@@ -13,7 +13,7 @@ const validarLogin = (req, res, next) => {
     next(); 
   } catch (error) {
    
-    const mensajesDeError = error.errors.map(err => err.message).join(" | ");
+    const mensajesDeError = error.issues.map(err => err.message).join(" | ");
     
     return res.render("login", { error: mensajesDeError });
   }
