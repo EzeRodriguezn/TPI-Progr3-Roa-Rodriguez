@@ -21,7 +21,7 @@ Venta.belongsToMany(Producto, { through: ProductoVentas });
 Producto.belongsToMany(Venta, { through: ProductoVentas });
 
 async function syncMuchos() {
-  await sequelize.sync({ alter: true });
+  await sequelize.sync();
 }
 
 syncMuchos();
