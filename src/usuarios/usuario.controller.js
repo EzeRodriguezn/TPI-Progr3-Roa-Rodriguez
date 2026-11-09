@@ -94,5 +94,5 @@ module.exports = {
   modificarUsuarioPorId,
   eliminarUsuarioPorId,
   procesarLogin,
-  cerrarSesion
-};
+  cerrarSesion,
+}
