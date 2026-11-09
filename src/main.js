@@ -1,34 +1,28 @@
-// 1. Importar el framework
+// 1. Importar el framework y librerías
 const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser"); // Reemplaza a express-session
+
 const productoRouter = require("./productos/producto.routes");
 const usuarioRouter = require("./usuarios/usuario.routes");
 const ventaRouter = require("./ventas/venta.routes");
-
-const cors = require("cors");
-const session = require("express-session");
-
 const sequelize = require("./database/sequelize");
 const { Usuario, Producto, Venta } = require("./database/relaciones");
 
 // 2. Crear la instancia
 const app = express();
 
-// 3. Configuraciones extra
-app.use(express.json());
+// 3. Configuraciones extra (Middlewares)
+app.use(express.json()); // Permite leer el JSON de Postman y el Frontend
 app.use(express.urlencoded({ extended: true }));
-app.use(session({
-  secret: process.env.SESSION_SECRET || "clave-local-desarrollo",
-  resave: false,
-  saveUninitialized: false
-}));
+app.use(cookieParser()); // Permite leer la cookie "adminLogueado"
+
 app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
-// Configuración de EJS para tus vistas 
 // Configuración de EJS para tus vistas
 app.set("view engine", "ejs");
 app.set("views", "./src/view"); 
-
 
 app.use(
   cors({
@@ -37,7 +31,7 @@ app.use(
   })
 );
 
-// 4. Definir las rutas
+// 4. Definir las rutas principales
 app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
@@ -49,15 +43,14 @@ app.get("/login", (req, res) => {
 
 // Ruta para mostrar el panel principal (Dashboard)
 app.get("/dashboard", (req, res) => {
-  res.render("index"); // Busca index.ejs en la carpeta view
+  res.render("index"); 
 });
 
-
+// Manejador global de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send({ error: "Ocurrió un error en el servidor" });
 });
-
 
 const PORT = 3000;
 
