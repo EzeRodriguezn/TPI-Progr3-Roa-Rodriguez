@@ -5,6 +5,7 @@ const usuarioRouter = require("./usuarios/usuario.routes");
 const ventaRouter = require("./ventas/venta.routes");
 
 const cors = require("cors");
+const session = require("express-session");
 
 const sequelize = require("./database/sequelize");
 const { Usuario, Producto, Venta } = require("./database/relaciones");
@@ -14,6 +15,12 @@ const app = express();
 
 // 3. Configuraciones extra
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || "clave-local-desarrollo",
+  resave: false,
+  saveUninitialized: false
+}));
 app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
