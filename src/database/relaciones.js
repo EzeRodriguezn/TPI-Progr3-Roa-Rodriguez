@@ -20,12 +20,6 @@ Venta.belongsTo(Usuario, {
 Venta.belongsToMany(Producto, { through: ProductoVentas });
 Producto.belongsToMany(Venta, { through: ProductoVentas });
 
-async function syncMuchos() {
-  await sequelize.sync();
-}
-
-syncMuchos();
-
 module.exports = {
   Usuario,
   Venta,

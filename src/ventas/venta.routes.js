@@ -11,11 +11,10 @@ const {
 
 const ventaRouter = express.Router();
 
-// --- RUTAS API (Para el Frontend) ---
-// Tiene que ir ANTES que los /:id
 ventaRouter.post("/api", registrarVentaAPI);
 
-// --- RUTAS CRUD DEL ADMINISTRADOR ---
+ventaRouter.use(require("../middleware/autenticacion").protegerRuta);
+
 ventaRouter.get("/", traerVentas);
 ventaRouter.post("/", crearVenta);
 ventaRouter.post("/producto", agregarProductoVenta);
