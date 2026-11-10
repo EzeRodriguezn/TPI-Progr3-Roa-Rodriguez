@@ -27,7 +27,7 @@
         
         <form action="/usuarios/login" method="POST">
             
-            <input type="text" id="username" name="username" placeholder="Correo electrónico o Usuario" required>
+            <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
             <input type="password" id="password" name="password" placeholder="Contraseña" required>
             <button type="submit" class="btn-ingresar">Ingresar</button>
         </form>
@@ -40,7 +40,7 @@
     <script>
         document.getElementById('btn-tester').addEventListener('click', () => {
           
-            document.getElementById('username').value = 'pepitocarp@gmail.com'; 
+            document.getElementById('email').value = 'admin@gmail.com';
             document.getElementById('password').value = '123456';
         });
     </script>

@@ -1,88 +1,163 @@
-const { Op } = require("sequelize");
+const bcrypt = require("bcryptjs");
 const { Usuario } = require("../database/relaciones");
-const bcrypt = require("bcryptjs"); 
+
+const publicUserAttributes = ["id", "nombre", "email", "createdAt", "updatedAt"];
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const crearUsuario = async (req, res) => {
-  const { username, password, rol } = req.body;
+  const body = req.body || {};
+  const email = body.email ?? body.username;
+  const { nombre, password } = body;
 
-  // 1. Encriptamos la clave recibida antes de guardarla
-  const salt = await bcrypt.genSalt(10);
-  const passwordHasheada = await bcrypt.hash(password, salt);
+  if (typeof email !== "string" || !emailPattern.test(email)) {
+    return res.status(400).json({ error: "Se requiere un email válido" });
+  }
+  if (typeof password !== "string" || password.length === 0) {
+    return res.status(400).json({ error: "La contraseña es obligatoria" });
+  }
+  if (nombre !== undefined && nombre !== null && typeof nombre !== "string") {
+    return res.status(400).json({ error: "El nombre debe ser un texto" });
+  }
 
-  const usuarioCreado = await Usuario.create({
-    username: username,
-    password: passwordHasheada, // Guardamos la contraseña encriptada
-    rol: rol,
-  });
+  try {
+    const passwordHasheada = await bcrypt.hash(password, 10);
+    const usuarioCreado = await Usuario.create({
+      nombre: nombre ?? null,
+      email,
+      password: passwordHasheada,
+    });
 
-  res.send(usuarioCreado);
+    res.status(201).json(await Usuario.findByPk(usuarioCreado.id, {
+      attributes: publicUserAttributes,
+    }));
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ error: "Ya existe un usuario con ese email" });
+    }
+    throw error;
+  }
 };
 
 const traerUsuarios = async (req, res) => {
-  const usuarios = await Usuario.findAll({ order: [["username", "ASC"]] });
-  res.send(usuarios);
+  const usuarios = await Usuario.findAll({
+    attributes: publicUserAttributes,
+    order: [["email", "ASC"]],
+  });
+  res.json(usuarios);
 };
 
 const traerUsuarioPorId = async (req, res) => {
-  const id = req.params.id;
-  const usuario = await Usuario.findByPk(id);
-  res.send(usuario);
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+
+  const usuario = await Usuario.findByPk(id, {
+    attributes: publicUserAttributes,
+  });
+  if (!usuario) {
+    return res.status(404).json({ error: "Usuario no encontrado" });
+  }
+
+  res.json(usuario);
 };
 
 const modificarUsuarioPorId = async (req, res) => {
-  const { username, password, rol } = req.body;
-  const { id } = req.params;
+  const id = Number(req.params.id);
+  const body = req.body || {};
 
-  let datosAModificar = {};
-
-  if (username) datosAModificar.username = username;
-  if (password) {
-    // Si desde Postman intentan modificar la clave, también hay que encriptarla
-    const salt = await bcrypt.genSalt(10);
-    datosAModificar.password = await bcrypt.hash(password, salt);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
   }
-  if (rol) datosAModificar.rol = rol;
 
-  const modificado = await Usuario.update(datosAModificar, {
-    where: { id },
-  });
+  const datosAModificar = {};
+  if (body.nombre !== undefined) {
+    if (body.nombre !== null && typeof body.nombre !== "string") {
+      return res.status(400).json({ error: "El nombre debe ser un texto" });
+    }
+    datosAModificar.nombre = body.nombre;
+  }
 
-  res.send(modificado);
+  const email = body.email ?? body.username;
+  if (email !== undefined) {
+    if (typeof email !== "string" || !emailPattern.test(email)) {
+      return res.status(400).json({ error: "Se requiere un email válido" });
+    }
+    datosAModificar.email = email;
+  }
+
+  if (body.password !== undefined) {
+    if (typeof body.password !== "string" || body.password.length === 0) {
+      return res.status(400).json({ error: "La contraseña no puede estar vacía" });
+    }
+    datosAModificar.password = await bcrypt.hash(body.password, 10);
+  }
+
+  if (Object.keys(datosAModificar).length === 0) {
+    return res.status(400).json({ error: "No se enviaron campos para modificar" });
+  }
+
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) {
+    return res.status(404).json({ error: "Usuario no encontrado" });
+  }
+
+  try {
+    await usuario.update(datosAModificar);
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({ error: "Ya existe un usuario con ese email" });
+    }
+    throw error;
+  }
+
+  res.json(await Usuario.findByPk(id, { attributes: publicUserAttributes }));
 };
 
 const eliminarUsuarioPorId = async (req, res) => {
-  const eliminado = await Usuario.destroy({ where: { id: req.params.id } });
-  res.send(eliminado);
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) {
+    return res.status(404).json({ error: "Usuario no encontrado" });
+  }
+
+  try {
+    await usuario.destroy();
+  } catch (error) {
+    if (error.name === "SequelizeForeignKeyConstraintError") {
+      return res.status(409).json({ error: "No se puede eliminar el usuario porque tiene ventas asociadas" });
+    }
+    throw error;
+  }
+
+  res.status(204).end();
 };
 
 const procesarLogin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const body = req.body || {};
+    const email = body.email ?? body.username;
+    const { password } = body;
 
-    const usuario = await Usuario.findOne({ where: { username } });
-    if (!usuario) {
-      return res.render("login", { error: "Credenciales incorrectas" });
+    const usuario = await Usuario.findOne({ where: { email } });
+    if (!usuario || typeof password !== "string" ||
+        !(await bcrypt.compare(password, usuario.password))) {
+      return res.status(401).render("login", { error: "Credenciales incorrectas" });
     }
 
-    // Compara la contraseña que llega del formulario con la encriptada de la BD
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-    if (!passwordValida) {
-      return res.render("login", { error: "Credenciales incorrectas" });
-    }
-
-    // Usamos cookies nativas de Express en lugar de express-session
     res.cookie("adminLogueado", "true", { maxAge: 1000 * 60 * 60 * 24 });
-
     res.redirect("/dashboard");
-
   } catch (error) {
     console.error("Error en el login:", error);
-    res.render("login", { error: "Ocurrió un error en el servidor" });
+    res.status(500).render("login", { error: "Ocurrió un error en el servidor" });
   }
 };
 
 const cerrarSesion = (req, res) => {
-  // Borramos la cookie para desloguear al usuario
   res.clearCookie("adminLogueado");
   res.redirect("/login");
 };
@@ -95,4 +170,4 @@ module.exports = {
   eliminarUsuarioPorId,
   procesarLogin,
   cerrarSesion,
-}
+};

@@ -9,7 +9,11 @@ const Usuario = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    username: {
+    nombre: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -17,11 +21,7 @@ const Usuario = sequelize.define(
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    rol: {
-      type: DataTypes.STRING,
-      defaultValue: "admin", 
-    },
+    }
   },
   {
     tableName: "usuarios",
