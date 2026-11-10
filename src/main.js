@@ -1,0 +1,64 @@
+// 1. Importar el framework y librerías
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser"); // Reemplaza a express-session
+
+const productoRouter = require("./productos/producto.routes");
+const usuarioRouter = require("./usuarios/usuario.routes");
+const ventaRouter = require("./ventas/venta.routes");
+const sequelize = require("./database/sequelize");
+const { Usuario, Producto, Venta } = require("./database/relaciones");
+
+// 2. Crear la instancia
+const app = express();
+
+// 3. Configuraciones extra
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/imagenes", express.static("img"));
+app.use("/public", express.static("public"));
+
+// Configuración de EJS para tus vistas
+app.set("view engine", "ejs");
+app.set("views", "./src/view"); 
+
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5500",
+    allowedHeaders: "content-type",
+  })
+);
+
+// 4. Definir las rutas principales
+app.use("/productos", productoRouter);
+app.use("/usuarios", usuarioRouter);
+app.use("/ventas", ventaRouter);
+
+// Ruta para mostrar la vista del login HTML
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+// Ruta para mostrar el panel principal (Dashboard)
+app.get("/dashboard", (req, res) => {
+  res.render("index"); 
+});
+
+// Manejador global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ error: "Ocurrió un error en el servidor" });
+});
+
+const PORT = 3000;
+
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log("Conexion establecida!!");
+    app.listen(PORT, () => {
+      console.log(`El server inició correctamente en el puerto ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Error al conectar a la base de datos:", error);
+  });
