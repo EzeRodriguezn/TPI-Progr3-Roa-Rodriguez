@@ -14,7 +14,7 @@ const { protegerRuta } = require("../middleware/autenticacion");
 
 const usuarioRouter = express.Router();
 
-// --- RUTAS DE AUTENTICACIÓN ---
+// --- RUTAS PÚBLICAS ---
 usuarioRouter.get("/login", (req, res) => {
   res.render("login");
 });
@@ -22,11 +22,14 @@ usuarioRouter.get("/login", (req, res) => {
 usuarioRouter.post("/login", validarLogin, procesarLogin);
 usuarioRouter.get("/logout", cerrarSesion);
 
-usuarioRouter.use(protegerRuta);
-
-usuarioRouter.get("/", traerUsuarios);
+// Movimos el POST de creación arriba para que no requiera token/cookie
 usuarioRouter.post("/", crearUsuario);
 
+// --- BARRERA DE SEGURIDAD ---
+usuarioRouter.use(protegerRuta);
+
+// --- RUTAS PROTEGIDAS ---
+usuarioRouter.get("/", traerUsuarios);
 usuarioRouter.get("/:id", traerUsuarioPorId);
 usuarioRouter.put("/:id", modificarUsuarioPorId);
 usuarioRouter.delete("/:id", eliminarUsuarioPorId);

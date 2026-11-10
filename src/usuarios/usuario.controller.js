@@ -1,30 +1,32 @@
 const bcrypt = require("bcryptjs");
 const { Usuario } = require("../database/relaciones");
 
-const publicUserAttributes = ["id", "nombre", "email", "createdAt", "updatedAt"];
+// Actualizamos los atributos para que coincidan con tu base de datos real
+const publicUserAttributes = ["id", "username", "rol", "createdAt", "updatedAt"];
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const crearUsuario = async (req, res, next) => {
   const body = req.body || {};
-  const email = body.email ?? body.username;
-  const { nombre, password } = body;
+  // Si envían "email" por costumbre, lo tomamos como "username"
+  const username = body.username ?? body.email; 
+  const { password, rol } = body;
 
-  if (typeof email !== "string" || !emailPattern.test(email)) {
-    return res.status(400).json({ error: "Se requiere un email válido" });
+  if (typeof username !== "string" || !emailPattern.test(username)) {
+    return res.status(400).json({ error: "Se requiere un username válido (formato correo)" });
   }
   if (typeof password !== "string" || password.length === 0) {
     return res.status(400).json({ error: "La contraseña es obligatoria" });
   }
-  if (nombre !== undefined && nombre !== null && typeof nombre !== "string") {
-    return res.status(400).json({ error: "El nombre debe ser un texto" });
+  if (rol !== undefined && rol !== null && typeof rol !== "string") {
+    return res.status(400).json({ error: "El rol debe ser un texto" });
   }
 
   try {
     const passwordHasheada = await bcrypt.hash(password, 10);
     const usuarioCreado = await Usuario.create({
-      nombre: nombre ?? null,
-      email,
+      username,
       password: passwordHasheada,
+      rol: rol || "admin",
     });
 
     res.status(201).json(await Usuario.findByPk(usuarioCreado.id, {
@@ -32,7 +34,7 @@ const crearUsuario = async (req, res, next) => {
     }));
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(409).json({ error: "Ya existe un usuario con ese email" });
+      return res.status(409).json({ error: "Ya existe un usuario con ese username" });
     }
     return next(error);
   }
@@ -42,7 +44,7 @@ const traerUsuarios = async (req, res, next) => {
   try {
     const usuarios = await Usuario.findAll({
       attributes: publicUserAttributes,
-      order: [["email", "ASC"]],
+      order: [["username", "ASC"]],
     });
     res.json(usuarios);
   } catch (error) {
@@ -79,19 +81,20 @@ const modificarUsuarioPorId = async (req, res, next) => {
   }
 
   const datosAModificar = {};
-  if (body.nombre !== undefined) {
-    if (body.nombre !== null && typeof body.nombre !== "string") {
-      return res.status(400).json({ error: "El nombre debe ser un texto" });
+  
+  const username = body.username ?? body.email;
+  if (username !== undefined) {
+    if (typeof username !== "string" || !emailPattern.test(username)) {
+      return res.status(400).json({ error: "Se requiere un username válido (formato correo)" });
     }
-    datosAModificar.nombre = body.nombre;
+    datosAModificar.username = username;
   }
 
-  const email = body.email ?? body.username;
-  if (email !== undefined) {
-    if (typeof email !== "string" || !emailPattern.test(email)) {
-      return res.status(400).json({ error: "Se requiere un email válido" });
+  if (body.rol !== undefined) {
+    if (typeof body.rol !== "string") {
+      return res.status(400).json({ error: "El rol debe ser un texto" });
     }
-    datosAModificar.email = email;
+    datosAModificar.rol = body.rol;
   }
 
   if (body.password !== undefined) {
@@ -117,7 +120,7 @@ const modificarUsuarioPorId = async (req, res, next) => {
     await usuario.update(datosAModificar);
   } catch (error) {
     if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(409).json({ error: "Ya existe un usuario con ese email" });
+      return res.status(409).json({ error: "Ya existe un usuario con ese username" });
     }
     return next(error);
   }
@@ -154,10 +157,12 @@ const eliminarUsuarioPorId = async (req, res, next) => {
 const procesarLogin = async (req, res, next) => {
   try {
     const body = req.body || {};
-    const email = body.email ?? body.username;
+    // Reemplazamos la búsqueda por email por username
+    const username = body.username ?? body.email;
     const { password } = body;
 
-    const usuario = await Usuario.findOne({ where: { email } });
+    const usuario = await Usuario.findOne({ where: { username } });
+    
     if (!usuario || typeof password !== "string" ||
         !(await bcrypt.compare(password, usuario.password))) {
       return res.status(401).render("login", { error: "Credenciales incorrectas" });
