@@ -14,6 +14,7 @@ const app = express();
 
 // 3. Configuraciones extra
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
@@ -54,7 +55,7 @@ app.use((err, req, res, next) => {
 
 const PORT = 3000;
 
-sequelize.authenticate()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log("Conexion establecida!!");
     app.listen(PORT, () => {
