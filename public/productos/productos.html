@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Productos · TechPoint</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="../global.css" />
+    <script src="../js/tema.js"></script>
+  </head>
+  <body data-pagina="productos">
+    <header id="encabezado"></header>
+
+    <main class="container py-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <h1 class="h3 mb-0">Elegí tus productos, <span id="nombre-cliente"></span></h1>
+        <a href="../carrito/index.html" class="btn btn-primary">
+          <i class="bi bi-cart3"></i> Ir al carrito
+        </a>
+      </div>
+
+      <ul class="nav nav-pills mb-4" id="tabs"></ul>
+
+      <div class="row g-4 row-cols-1 row-cols-sm-2 row-cols-lg-3" id="grilla">
+        <div class="col-12 text-center text-body-secondary py-5">Cargando productos…</div>
+      </div>
+
+      <nav aria-label="Paginación de productos">
+        <ul class="pagination justify-content-center mt-4" id="paginacion"></ul>
+      </nav>
+    </main>
+
+    <footer id="pie"></footer>
+
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/estado.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="productos.js"></script>
+  </body>
+</html>
