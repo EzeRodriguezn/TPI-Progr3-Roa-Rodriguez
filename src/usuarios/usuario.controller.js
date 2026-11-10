@@ -3,15 +3,15 @@ const { Usuario } = require("../database/relaciones");
 
 const crearUsuario = async (req, res) => {
   try {
-    const { username, password, rol } = req.body;
-    
+    const { nombre, email, password } = req.body;
+
     const salt = await bcrypt.genSalt(10);
     const passwordHasheada = await bcrypt.hash(password, salt);
 
     const usuarioCreado = await Usuario.create({
-      username: username,
+      nombre: nombre || "Admin",
+      email,
       password: passwordHasheada,
-      rol: rol || "admin"
     });
 
     res.send(usuarioCreado);
@@ -23,9 +23,9 @@ const crearUsuario = async (req, res) => {
 
 const procesarLogin = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
-    const usuario = await Usuario.findOne({ where: { username: username } });
+    const usuario = await Usuario.findOne({ where: { email } });
     if (!usuario) {
       return res.render("login", { error: "Credenciales incorrectas" });
     }
