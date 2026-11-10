@@ -12,11 +12,9 @@ const { Usuario, Producto, Venta } = require("./database/relaciones");
 // 2. Crear la instancia
 const app = express();
 
-// 3. Configuraciones extra (Middlewares)
-app.use(express.json()); // Permite leer el JSON de Postman y el Frontend
+// 3. Configuraciones extra
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // Permite leer la cookie "adminLogueado"
-
 app.use("/imagenes", express.static("img"));
 app.use("/public", express.static("public"));
 
