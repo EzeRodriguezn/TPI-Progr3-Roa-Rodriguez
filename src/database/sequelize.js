@@ -4,5 +4,3 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize("mysql://root:123456@localhost:3306/TPI" );
 
 module.exports = sequelize;
-
-//node src/main.js

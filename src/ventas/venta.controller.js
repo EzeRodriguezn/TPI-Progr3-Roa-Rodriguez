@@ -1,79 +1,121 @@
-const { Op } = require("sequelize");
-const { Venta, Producto, ProductoVentas } = require("../database/relaciones");
+const sequelize = require("../database/sequelize");
+const { Usuario, Venta, Producto } = require("../database/relaciones");
 
-const crearVenta = async (req, res) => {
-  const { total, idUsuario } = req.body;
+const registrarVentaAPI = async (req, res) => {
+  try {
+    const body = req.body || {};
+    const idUsuario = Number(body.idUsuario ?? 1);
+    const carrito = body.carrito;
 
-  const ventaCreada = await Venta.create({
-    total: total,
-    idUsuario: idUsuario, // Este es el ID del cajero que hace la venta
-  });
+    if (!Number.isSafeInteger(idUsuario) || idUsuario <= 0) {
+      return res.status(400).json({ error: "idUsuario debe ser un entero positivo" });
+    }
+    if (!Array.isArray(carrito) || carrito.length === 0) {
+      return res.status(400).json({ error: "carrito debe contener al menos un producto" });
+    }
 
-  res.send(ventaCreada);
-};
+    const cantidades = new Map();
+    for (const item of carrito) {
+      const idProducto = Number(item?.idProducto);
+      const cantidad = Number(item?.cantidad);
+      if (!Number.isSafeInteger(idProducto) || idProducto <= 0 ||
+          !Number.isSafeInteger(cantidad) || cantidad <= 0) {
+        return res.status(400).json({
+          error: "Cada producto debe tener idProducto y cantidad como enteros positivos",
+        });
+      }
 
-const agregarProductoVenta = async (req, res) => {
-  const { idVenta, idProducto, cantidad, precio_historico } = req.body;
+      const cantidadTotal = (cantidades.get(idProducto) || 0) + cantidad;
+      if (!Number.isSafeInteger(cantidadTotal)) {
+        return res.status(400).json({ error: "La cantidad solicitada no es válida" });
+      }
+      cantidades.set(idProducto, cantidadTotal);
+    }
 
-  const venta = await Venta.findByPk(idVenta);
-  const producto = await Producto.findByPk(idProducto);
+    const resultado = await sequelize.transaction(async (transaction) => {
+      const usuario = await Usuario.findByPk(idUsuario, { transaction });
+      if (!usuario) {
+        return { status: 404, error: "Usuario no encontrado" };
+      }
 
-  if (venta && producto) {
-    const relacion = await ProductoVentas.create({
-      idVenta: idVenta,
-      idProducto: idProducto,
-      cantidad: cantidad,
-      precio_historico: precio_historico,
+      const idsProducto = [...cantidades.keys()];
+      const productos = await Producto.findAll({
+        where: { id: idsProducto, activo: true },
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (productos.length !== idsProducto.length) {
+        return { status: 400, error: "El carrito contiene productos inexistentes o inactivos" };
+      }
+
+      let totalCentavos = 0;
+      const detalles = productos.map((producto) => {
+        const precio = String(producto.precio);
+        if (!/^\d+(?:\.\d{1,2})?$/.test(precio)) {
+          throw new Error(`Precio inválido para el producto ${producto.id}`);
+        }
+
+        const [entero, decimales = ""] = precio.split(".");
+        const precioCentavos = Number(entero) * 100 + Number(decimales.padEnd(2, "0"));
+        const cantidad = cantidades.get(producto.id);
+        totalCentavos += precioCentavos * cantidad;
+        if (!Number.isSafeInteger(totalCentavos) || totalCentavos > 9_999_999_999) {
+          return null;
+        }
+
+        return { producto, cantidad, precio: (precioCentavos / 100).toFixed(2) };
+      });
+
+      if (detalles.includes(null)) {
+        return { status: 400, error: "El total de la venta excede el máximo permitido" };
+      }
+
+      const nuevaVenta = await Venta.create({
+        total: (totalCentavos / 100).toFixed(2),
+        idUsuario,
+      }, { transaction });
+
+      for (const detalle of detalles) {
+        await nuevaVenta.addProducto(detalle.producto, {
+          through: {
+            cantidad: detalle.cantidad,
+            precio_historico: detalle.precio,
+          },
+          transaction,
+        });
+      }
+
+      return { idVenta: nuevaVenta.id };
     });
-    res.send({ ok: true });
-  } else {
-    res.send({ ok: false });
+
+    if (resultado.error) {
+      return res.status(resultado.status).json({ error: resultado.error });
+    }
+
+    res.status(201).json({
+      mensaje: "Venta registrada con éxito",
+      idVenta: resultado.idVenta,
+    });
+  } catch (error) {
+    console.error("Error al registrar la venta:", error);
+    res.status(500).json({ error: "Error al registrar la venta" });
   }
 };
 
-const traerVentas = async (req, res) => {
-  // Ordenamos por fecha de creación descendente (las más nuevas primero)
-  const ventas = await Venta.findAll({ order: [["createdAt", "DESC"]] });
-
-  res.send(ventas);
-};
-
-const traerVentaPorId = async (req, res) => {
-  const id = req.params.id;
-
-  const venta = await Venta.findByPk(id);
-
-  res.send(venta);
-};
-
-const modificarVentaPorId = async (req, res) => {
-  const { total } = req.body;
-  const { id } = req.params;
-
-  let datosAModificar = {};
-
-  if (total) {
-    datosAModificar.total = total;
-  }
-
-  const modificado = await Venta.update(datosAModificar, {
-    where: { id },
-  });
-
-  res.send(modificado);
-};
-
-const eliminarVentaPorId = async (req, res) => {
-  const eliminado = await Venta.destroy({ where: { id: req.params.id } });
-
-  res.send(eliminado);
-};
+// CRUD original comprimido
+const traerVentas = async (req, res) => res.send(await Venta.findAll({ order: [["createdAt", "DESC"]] }));
+const traerVentaPorId = async (req, res) => res.send(await Venta.findByPk(req.params.id));
+const eliminarVentaPorId = async (req, res) => res.send(await Venta.destroy({ where: { id: req.params.id } }));
+const crearVenta = async (req, res) => res.send(await Venta.create(req.body));
+const agregarProductoVenta = async (req, res) => res.send(await ProductoVentas.create(req.body));
+const modificarVentaPorId = async (req, res) => res.send(await Venta.update(req.body, { where: { id: req.params.id } }));
 
 module.exports = {
-  crearVenta,
-  agregarProductoVenta,
-  traerVentas,
-  traerVentaPorId,
-  modificarVentaPorId,
-  eliminarVentaPorId,
+  registrarVentaAPI, 
+  traerVentas, 
+  traerVentaPorId, 
+  eliminarVentaPorId, 
+  crearVenta, 
+  agregarProductoVenta, 
+  modificarVentaPorId
 };
