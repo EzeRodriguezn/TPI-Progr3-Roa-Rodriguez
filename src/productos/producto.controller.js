@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { Producto } = require("../database/relaciones");
 
 // 1. Mostrar la tabla con todos los productos (Renderiza EJS)
@@ -72,20 +71,23 @@ const modificarProductoPorId = async (req, res) => {
 
     let datosAModificar = {};
 
-    if (nombre) datosAModificar.nombre = nombre;
-    if (precio) datosAModificar.precio = precio;
+    if (nombre !== undefined) datosAModificar.nombre = nombre;
+    if (precio !== undefined) datosAModificar.precio = precio;
     if (stock !== undefined) datosAModificar.stock = stock;
-    if (categoria) datosAModificar.categoria = categoria;
-    if (subcategoria) datosAModificar.subcategoria = subcategoria;
+    if (categoria !== undefined) datosAModificar.categoria = categoria;
+    if (subcategoria !== undefined) datosAModificar.subcategoria = subcategoria;
 
     // Si el usuario subió una imagen nueva, la pisamos
     if (req.file) {
       datosAModificar.imagen = req.file.filename;
     }
 
-    await Producto.update(datosAModificar, {
-      where: { id },
-    });
+    const producto = await Producto.findByPk(id);
+    if (!producto) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    await producto.update(datosAModificar);
 
     res.redirect("/productos");
   } catch (error) {
@@ -115,7 +117,23 @@ const reactivarProducto = async (req, res) => {
     res.status(500).send("Error al reactivar el producto");
   }
 };
+// Función exclusiva para el frontend (Autoservicio)
+const traerProductosAPI = async (req, res) => {
+  try {
+    // Buscamos solo los productos que estén activos
+    const productos = await Producto.findAll({
+      where: {
+        activo: true // Ajustá este nombre si en tu base de datos la columna se llama distinto (ej: estado, disponible)
+      }
+    });
 
+    // En vez de un res.render, devolvemos un JSON
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener productos para la API:", error);
+    res.status(500).json({ error: "Ocurrió un error en el servidor" });
+  }
+};
 module.exports = {
   traerProductos,
   mostrarFormularioNuevo,
@@ -124,4 +142,5 @@ module.exports = {
   modificarProductoPorId,
   desactivarProducto,
   reactivarProducto,
+  traerProductosAPI,
 };
