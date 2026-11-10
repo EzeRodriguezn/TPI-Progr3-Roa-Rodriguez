@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="es" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrito · Rtech</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="../global.css" />
+    <script src="../js/tema.js"></script>
+  </head>
+  <body data-pagina="carrito">
+    <header id="encabezado"></header>
+
+    <main class="container py-4" style="max-width: 860px">
+      <h1 class="h3 mb-3"><i class="bi bi-cart3"></i> Tu carrito</h1>
+
+      <div id="lista-carrito"></div>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4">
+        <a href="../productos/index.html" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Seguir comprando
+        </a>
+        <div class="d-flex align-items-center gap-3">
+          <span class="fs-4">Total: <strong class="precio" id="total">$ 0,00</strong></span>
+          <button class="btn btn-primary btn-lg" id="btn-finalizar" data-bs-toggle="modal" data-bs-target="#modal-confirmar" disabled>
+            Finalizar compra
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade" id="modal-confirmar" tabindex="-1" aria-labelledby="titulo-modal" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="titulo-modal">Confirmar compra</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-1">¿Querés confirmar la compra?</p>
+            <p class="mb-0 fw-semibold">Total: <span id="total-modal"></span></p>
+            <div class="alert alert-danger mt-3 mb-0 d-none" id="error-compra"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="btn-confirmar">Confirmar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer id="pie"></footer>
+
+    <script src="../../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="../js/estado.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/layout.js"></script>
+    <script src="carrito.js"></script>
+  </body>
+</html>
