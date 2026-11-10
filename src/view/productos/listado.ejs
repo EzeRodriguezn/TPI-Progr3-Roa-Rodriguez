@@ -25,9 +25,7 @@
 
     <div class="container">
         <h2>Catálogo de Productos</h2>
-        <% if (adminLogueado) { %>
-            <a href="/productos/nuevo" class="btn btn-nuevo">+ Agregar Nuevo Producto</a>
-        <% } %>
+        <a href="/productos/nuevo" class="btn btn-nuevo">+ Agregar Nuevo Producto</a>
 
         <table>
             <thead>
@@ -39,7 +37,7 @@
                     <th>Stock</th>
                     <th>Categoría</th>
                     <th>Estado</th>
-                    <% if (adminLogueado) { %><th>Acciones</th><% } %>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -49,7 +47,8 @@
                         <tr>
                             <td><%= producto.id %></td>
                             <td>
-                                <img src="/imagenes/<%= producto.imagen || 'default.png' %>" class="miniatura" alt="Imagen producto">
+                                <!-- Asumiendo que la ruta se arma con public/descargas -->
+                                <img src="/public/descargas/<%= producto.imagen %>" class="miniatura" alt="Imagen producto">
                             </td>
                             <td><%= producto.nombre %></td>
                             <td>$<%= producto.precio %></td>
@@ -63,7 +62,6 @@
                                     <span style="color: red; font-weight: bold;">Inactivo</span>
                                 <% } %>
                             </td>
-                            <% if (adminLogueado) { %>
                             <td>
                                 <a href="/productos/editar/<%= producto.id %>" class="btn btn-editar">Editar</a>
                                 
@@ -78,12 +76,11 @@
                                     </form>
                                 <% } %>
                             </td>
-                            <% } %>
                         </tr>
                     <% }) %>
                 <% } else { %>
                     <tr>
-                        <td colspan="<%= adminLogueado ? 8 : 7 %>" style="text-align: center;">No hay productos cargados en la base de datos.</td>
+                        <td colspan="8" style="text-align: center;">No hay productos cargados en la base de datos.</td>
                     </tr>
                 <% } %>
             </tbody>

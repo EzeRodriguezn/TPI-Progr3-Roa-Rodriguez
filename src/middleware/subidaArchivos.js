@@ -1,14 +1,9 @@
 const multer = require('multer');
-const fs = require('fs');
 const path = require('path');
-
-const directorioImagenes = path.join(__dirname, '..', '..', 'public', 'descargas');
 
 const almacenamiento = multer.diskStorage({
     destination: (peticion, archivo, callback) => {
-        fs.mkdir(directorioImagenes, { recursive: true }, (error) => {
-            callback(error, directorioImagenes);
-        });
+        callback(null, path.join(__dirname, '../../public/descargas'));
     },
     filename: (peticion, archivo, callback) => {
         const sufijoUnico = Date.now() + '-' + Math.round(Math.random() * 1E9);

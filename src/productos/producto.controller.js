@@ -1,6 +1,5 @@
 const { Op } = require("sequelize");
 const { Producto } = require("../database/relaciones");
-const categoriasPermitidas = new Set(["perifericos", "sillas"]);
 
 // 1. Mostrar la tabla con todos los productos (Renderiza EJS)
 const traerProductos = async (req, res) => {
@@ -42,10 +41,7 @@ const mostrarFormularioEdicion = async (req, res) => {
 const crearProducto = async (req, res) => {
   try {
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
-    if (!categoriasPermitidas.has(categoria)) {
-      return res.status(400).send("La categoría debe ser periféricos o sillas");
-    }
-
+    
     // Atrapamos la imagen procesada por Multer, o ponemos una por defecto
     const imagen = req.file ? req.file.filename : 'default.png';
 
@@ -73,10 +69,6 @@ const modificarProductoPorId = async (req, res) => {
     // Agregamos categoria y subcategoria que faltaban desestructurar del req.body
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
     const { id } = req.params;
-
-    if (categoria !== undefined && !categoriasPermitidas.has(categoria)) {
-      return res.status(400).send("La categoría debe ser periféricos o sillas");
-    }
 
     let datosAModificar = {};
 

@@ -1,13 +1,14 @@
 const protegerRuta = (req, res, next) => {
-  if (req.signedCookies && req.signedCookies.adminLogueado === "true") {
-    return next();
-  }
+  // Leemos las cookies directamente desde los headers de la petición
+  const cookies = req.headers.cookie;
 
-  if (req.baseUrl === "/usuarios" || req.baseUrl === "/ventas") {
-    return res.status(401).json({ error: "Se requiere iniciar sesión" });
+  // Si la cookie existe y tiene nuestro valor "true", lo dejamos pasar
+  if (cookies && cookies.includes("adminLogueado=true")) {
+    return next(); 
   }
-
-  return res.redirect("/login");
+  
+  // Si no tiene la cookie, lo pateamos al login
+  res.redirect("/login");
 };
 
 module.exports = { protegerRuta };

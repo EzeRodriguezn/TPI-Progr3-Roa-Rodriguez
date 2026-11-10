@@ -10,7 +10,6 @@ const {
 } = require("./usuario.controller");
 
 const { validarLogin } = require("../middleware/validarLogin");
-const { protegerRuta } = require("../middleware/autenticacion");
 
 const usuarioRouter = express.Router();
 
@@ -21,8 +20,6 @@ usuarioRouter.get("/login", (req, res) => {
 
 usuarioRouter.post("/login", validarLogin, procesarLogin);
 usuarioRouter.get("/logout", cerrarSesion);
-
-usuarioRouter.use(protegerRuta);
 
 usuarioRouter.get("/", traerUsuarios);
 usuarioRouter.post("/", crearUsuario);
