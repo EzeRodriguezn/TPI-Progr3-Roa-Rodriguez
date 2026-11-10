@@ -1,74 +1,58 @@
-const path = require("path");
+// 1. Importar el framework y librerías
 const express = require("express");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+const cookieParser = require("cookie-parser"); // Reemplaza a express-session
 
 const productoRouter = require("./productos/producto.routes");
 const usuarioRouter = require("./usuarios/usuario.routes");
 const ventaRouter = require("./ventas/venta.routes");
 const sequelize = require("./database/sequelize");
-require("./database/relaciones");
-const manejadorErrores = require("./middleware/errores");
-const { protegerRuta } = require("./middleware/autenticacion");
+const { Usuario, Producto, Venta } = require("./database/relaciones");
 
+// 2. Crear la instancia
 const app = express();
-const cookieSecret = process.env.COOKIE_SECRET;
 
-if (!cookieSecret || cookieSecret.length < 32) {
-  throw new Error("COOKIE_SECRET debe tener al menos 32 caracteres en el archivo .env");
-}
-
-const origenesConfigurados = (process.env.CORS_ORIGINS || "")
-  .split(",")
-  .map((origen) => origen.trim())
-  .filter(Boolean);
-
-app.set("trust proxy", process.env.NODE_ENV === "production");
-app.use(cookieParser(cookieSecret));
-app.use((req, res, next) => {
-  res.locals.adminLogueado = req.signedCookies.adminLogueado === "true";
-  next();
-});
+// 3. Configuraciones extra
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/imagenes", express.static(path.join(__dirname, "..", "public", "descargas")));
-app.use("/public", express.static(path.join(__dirname, "..", "public")));
+app.use("/imagenes", express.static("img"));
+app.use("/public", express.static("public"));
 
+// Configuración de EJS para tus vistas
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "view"));
+app.set("views", "./src/view"); 
 
 app.use(
   cors({
-    origin: (origen, callback) => {
-      const esOrigenLocal = !origen ||
-        /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origen);
-      if (esOrigenLocal || origenesConfigurados.includes(origen)) {
-        return callback(null, true);
-      }
-      return callback(new Error("Origen CORS no permitido"));
-    },
-    allowedHeaders: ["Content-Type"],
+    origin: "http://127.0.0.1:5500",
+    allowedHeaders: "content-type",
   })
 );
 
+// 4. Definir las rutas principales
 app.use("/productos", productoRouter);
 app.use("/usuarios", usuarioRouter);
 app.use("/ventas", ventaRouter);
 
+// Ruta para mostrar la vista del login HTML
 app.get("/login", (req, res) => {
   res.render("login");
 });
 
+// Ruta para mostrar el panel principal (Dashboard)
 app.get("/dashboard", (req, res) => {
-  protegerRuta(req, res, () => res.render("index"));
+  res.render("index"); 
 });
 
-app.use(manejadorErrores);
+// Manejador global de errores
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send({ error: "Ocurrió un error en el servidor" });
+});
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = 3000;
 
-sequelize.sync()
+sequelize.sync({ alter: true })
   .then(() => {
     console.log("Conexion establecida!!");
     app.listen(PORT, () => {

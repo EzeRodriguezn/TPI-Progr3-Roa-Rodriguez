@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const subidaArchivos = require("../middleware/subidaArchivos");
-const { protegerRuta } = require("../middleware/autenticacion");
 const {
   traerProductos,
   mostrarFormularioNuevo,
@@ -14,13 +13,13 @@ const {
 
 // RUTAS GET (Para mostrar las pantallas HTML del administrador)
 router.get("/", traerProductos);
-router.get("/nuevo", protegerRuta, mostrarFormularioNuevo);
-router.get("/editar/:id", protegerRuta, mostrarFormularioEdicion);
+router.get("/nuevo", mostrarFormularioNuevo);
+router.get("/editar/:id", mostrarFormularioEdicion);
 
 // RUTAS POST (Para enviar los datos de los formularios y ejecutar acciones)
-router.post("/nuevo", protegerRuta, subidaArchivos.single("imagen"), crearProducto);
-router.post("/editar/:id", protegerRuta, subidaArchivos.single("imagen"), modificarProductoPorId);
-router.post("/desactivar/:id", protegerRuta, desactivarProducto);
-router.post("/reactivar/:id", protegerRuta, reactivarProducto);
+router.post("/nuevo", subidaArchivos.single("imagen"), crearProducto);
+router.post("/editar/:id", subidaArchivos.single("imagen"), modificarProductoPorId);
+router.post("/desactivar/:id", desactivarProducto);
+router.post("/reactivar/:id", reactivarProducto);
 
 module.exports = router;
