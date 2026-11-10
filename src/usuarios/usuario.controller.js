@@ -35,7 +35,10 @@ const procesarLogin = async (req, res) => {
       return res.render("login", { error: "Credenciales incorrectas" });
     }
 
-    res.cookie("adminLogueado", "true", { maxAge: 1000 * 60 * 60 * 24 });
+    res.cookie("adminLogueado", "true", {
+      signed: true,
+      maxAge: 1000 * 60 * 60 * 24,
+    });
     res.redirect("/dashboard");
   } catch (error) {
     console.error("Error en el login:", error);
