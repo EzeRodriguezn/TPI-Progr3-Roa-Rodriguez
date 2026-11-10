@@ -7,7 +7,7 @@ const DB_PORT = Number(process.env.DB_PORT || 3306);
 
 if (!DB_HOST || !DB_NAME || !DB_USER || !Number.isInteger(DB_PORT) ||
     DB_PORT <= 0 || DB_PORT > 65535) {
-  throw new Error("ConfigurÃ¡ DB_HOST, DB_PORT, DB_NAME y DB_USER en el archivo .env");
+  throw new Error("Configurá DB_HOST, DB_PORT, DB_NAME y DB_USER en el archivo .env");
 }
 
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD || "", {
