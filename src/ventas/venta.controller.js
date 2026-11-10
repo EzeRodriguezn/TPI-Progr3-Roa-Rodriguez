@@ -103,14 +103,23 @@ const registrarVentaAPI = async (req, res) => {
 };
 
 const idPositivo = (valor) => {
+  if (typeof valor !== "number" && typeof valor !== "string") {
+    return null;
+  }
   const id = Number(valor);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
-const montoValido = (valor) =>
-  (typeof valor === "number" || typeof valor === "string") &&
-  /^\d+(?:\.\d{1,2})?$/.test(String(valor)) &&
-  Number.isFinite(Number(valor));
+const montoValido = (valor) => {
+  if ((typeof valor !== "number" && typeof valor !== "string") ||
+      !/^\d+(?:\.\d{1,2})?$/.test(String(valor))) {
+    return false;
+  }
+
+  const monto = Number(valor);
+  return Number.isFinite(monto) && monto <= 99_999_999.99 &&
+    Number.isSafeInteger(Math.round(monto * 100));
+};
 
 const objetoValido = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
 
@@ -158,7 +167,11 @@ const eliminarVentaPorId = async (req, res, next) => {
 
 const crearVenta = async (req, res, next) => {
   const body = req.body;
-  if (!objetoValido(body) || !montoValido(body.total) || !idPositivo(body.idUsuario)) {
+  const camposPermitidos = ["total", "idUsuario"];
+  if (!objetoValido(body) ||
+      Object.keys(body).some((campo) => !camposPermitidos.includes(campo)) ||
+      !montoValido(body.total) ||
+      !idPositivo(body.idUsuario)) {
     return res.status(400).json({ error: "total e idUsuario válidos son obligatorios" });
   }
 

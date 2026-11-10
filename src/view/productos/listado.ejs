@@ -55,7 +55,6 @@
                             <td>$<%= producto.precio %></td>
                             <td><%= producto.stock %></td>
                             <td><%= producto.categoria %></td>
-                            <% if (adminLogueado) { %>
                             <td>
                                 <!-- Verificamos si está dado de baja o activo -->
                                 <% if (producto.activo !== false) { %>
@@ -64,7 +63,7 @@
                                     <span style="color: red; font-weight: bold;">Inactivo</span>
                                 <% } %>
                             </td>
-                            <% } %>
+                            <% if (adminLogueado) { %>
                             <td>
                                 <a href="/productos/editar/<%= producto.id %>" class="btn btn-editar">Editar</a>
                                 
@@ -79,6 +78,7 @@
                                     </form>
                                 <% } %>
                             </td>
+                            <% } %>
                         </tr>
                     <% }) %>
                 <% } else { %>
