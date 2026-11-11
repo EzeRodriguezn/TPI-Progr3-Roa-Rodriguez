@@ -1,0 +1,9 @@
+main {
+  flex: 1;
+}
+
+.product-card-img {
+  height: 180px;
+  object-fit: contain;
+  padding: 1rem;
+}
