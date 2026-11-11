@@ -6,7 +6,7 @@ function inyectarLayout() {
   const rutaBase = esSubcarpeta ? '../' : './';
 
   header.innerHTML = `
-    <nav class="navbar navbar-expand-lg border-bottom sticky-top">
+    <nav class="navbar navbar-expand-lg border-bottom sticky-top bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center gap-2" href="${rutaBase}index.html">
           <span class="fw-bold">TechPoint Autoservicio</span>
