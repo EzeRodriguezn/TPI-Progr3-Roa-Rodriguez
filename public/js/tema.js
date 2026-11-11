@@ -1,15 +1,22 @@
-document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("tema") || "light");
+function inicializarTema() {
+  const temaGuardado = localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', temaGuardado);
+  actualizarBotonTema(temaGuardado);
+}
 
 function alternarTema() {
-  const nuevo = document.documentElement.getAttribute("data-bs-theme") === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-bs-theme", nuevo);
-  localStorage.setItem("tema", nuevo); // se mantiene al recargar
-  actualizarIconoTema();
+  const temaActual = document.documentElement.getAttribute('data-theme');
+  const nuevoTema = temaActual === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', nuevoTema);
+  localStorage.setItem('theme', nuevoTema);
+  actualizarBotonTema(nuevoTema);
 }
 
-function actualizarIconoTema() {
-  const icono = document.getElementById("icono-tema");
-  if (!icono) return;
-  const oscuro = document.documentElement.getAttribute("data-bs-theme") === "dark";
-  icono.className = oscuro ? "bi bi-moon-stars" : "bi bi-brightness-high";
+function actualizarBotonTema(tema) {
+  const btn = document.getElementById('btn-tema');
+  if (btn) {
+    btn.innerHTML = tema === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+  }
 }
+
+document.addEventListener('DOMContentLoaded', inicializarTema);
