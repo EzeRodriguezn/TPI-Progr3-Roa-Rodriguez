@@ -9,9 +9,11 @@ const {
   modificarProductoPorId,
   desactivarProducto,
   reactivarProducto,
+  traerProductosAPI,
 } = require("./producto.controller");
 
 // RUTAS GET (Para mostrar las pantallas HTML del administrador)
+router.get("/api", traerProductosAPI);
 router.get("/", traerProductos);
 router.get("/nuevo", mostrarFormularioNuevo);
 router.get("/editar/:id", mostrarFormularioEdicion);
