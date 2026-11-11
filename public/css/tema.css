@@ -28,13 +28,10 @@ body.dark-mode input {
   border: 1px solid #555555 !important;
 }
 
-/* Aclarar el color del texto de relleno ("Tu nombre...") */
 body.dark-mode input::placeholder {
   color: #bbbbbb !important;
 }
 
-/* Oscurecer también el fondo del recuadro central */
-/* (Ajusta ".modal-content" a la clase que uses en tu HTML para esa caja) */
 body.dark-mode .modal-content,
 body.dark-mode .card,
 body.dark-mode .contenedor {
