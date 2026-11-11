@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../database/sequelize");
+const sequelize = require("../database/sequelize"); 
 
 const Usuario = sequelize.define(
   "Usuario",
@@ -20,8 +20,7 @@ const Usuario = sequelize.define(
     },
     rol: {
       type: DataTypes.STRING,
-      allowNull: true,
-      defaultValue: "admin",
+      defaultValue: "admin", 
     },
   },
   {
