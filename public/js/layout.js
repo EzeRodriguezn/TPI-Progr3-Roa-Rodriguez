@@ -1,5 +1,7 @@
 function inyectarLayout() {
   const header = document.createElement('header');
+  
+  // Detección de subcarpetas para ajustar la ruta relativa de navegación
   const esSubcarpeta = window.location.pathname.includes('/productos/') || 
                        window.location.pathname.includes('/carrito/') || 
                        window.location.pathname.includes('/ticket/');
@@ -9,6 +11,7 @@ function inyectarLayout() {
     <nav class="navbar navbar-expand-lg border-bottom sticky-top bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center gap-2" href="${rutaBase}index.html">
+          <img src="${rutaBase}img/logo.svg" alt="Logo" width="30" height="30" onerror="this.style.display='none'">
           <span class="fw-bold">TechPoint Autoservicio</span>
         </a>
 
@@ -23,10 +26,10 @@ function inyectarLayout() {
         <div class="collapse navbar-collapse" id="navApp">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link" href="${rutaBase}productos/index.html">Productos</a>
+              <a class="nav-link" href="${rutaBase}productos/productos.html">Productos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="${rutaBase}carrito/index.html">
+              <a class="nav-link" href="${rutaBase}carrito/carrito.html">
                 Carrito <span id="cart-counter" class="badge bg-primary rounded-pill">0</span>
               </a>
             </li>
@@ -36,7 +39,7 @@ function inyectarLayout() {
             <button id="btn-tema" onclick="alternarTema()" class="btn btn-outline-secondary btn-sm">
               🌙 Modo Oscuro
             </button>
-            <a href="${CONFIG.API_BASE_URL}/usuarios/login" class="btn btn-outline-primary btn-sm">
+            <a href="http://localhost:3000/usuarios/login" class="btn btn-outline-primary btn-sm">
               Acceso Admin
             </a>
           </div>
@@ -44,6 +47,7 @@ function inyectarLayout() {
       </div>
     </nav>
   `;
+
   document.body.prepend(header);
   actualizarContadorCarrito();
 }

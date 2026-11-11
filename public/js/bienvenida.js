@@ -8,9 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const input = document.getElementById('input-nombre');
       const nombre = input ? input.value.trim() : '';
 
-      if (nombre) {
+      if (nombre.length >= 2) {
+        // Guardar el nombre en sessionStorage
         setNombreCliente(nombre);
-        window.location.href = 'productos/index.html';
+
+      
+        window.location.href = 'productos/productos.html';
+      } else {
+        alert('Por favor, ingresá un nombre válido.');
       }
     });
   }
