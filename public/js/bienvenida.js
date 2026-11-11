@@ -1,14 +1,11 @@
-const form = document.getElementById("form-bienvenida");
-const inputNombre = document.getElementById("nombre");
-
-inputNombre.value = Cliente.nombre() ?? "";
-
-form.addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  inputNombre.value = inputNombre.value.trim();
-  form.classList.add("was-validated");
-  if (!form.checkValidity()) return;
-
-  Cliente.guardar(inputNombre.value);
-  irA("productos/index.html");
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('form-bienvenida');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('input-nombre').value.trim();
+    if (nombre) {
+      setNombreCliente(nombre);
+      window.location.href = 'productos/index.html';
+    }
+  });
 });
