@@ -1,5 +1,5 @@
-const { Op } = require("sequelize");
 const { Producto } = require("../database/relaciones");
+const categoriasPermitidas = new Set(["perifericos", "sillas"]);
 
 // 1. Mostrar la tabla con todos los productos (Renderiza EJS)
 const traerProductos = async (req, res) => {
@@ -41,7 +41,10 @@ const mostrarFormularioEdicion = async (req, res) => {
 const crearProducto = async (req, res) => {
   try {
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
-    
+    if (!categoriasPermitidas.has(categoria)) {
+      return res.status(400).send("La categoría debe ser periféricos o sillas");
+    }
+
     // Atrapamos la imagen procesada por Multer, o ponemos una por defecto
     const imagen = req.file ? req.file.filename : 'default.png';
 
@@ -70,22 +73,29 @@ const modificarProductoPorId = async (req, res) => {
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
     const { id } = req.params;
 
+    if (categoria !== undefined && !categoriasPermitidas.has(categoria)) {
+      return res.status(400).send("La categoría debe ser periféricos o sillas");
+    }
+
     let datosAModificar = {};
 
-    if (nombre) datosAModificar.nombre = nombre;
-    if (precio) datosAModificar.precio = precio;
+    if (nombre !== undefined) datosAModificar.nombre = nombre;
+    if (precio !== undefined) datosAModificar.precio = precio;
     if (stock !== undefined) datosAModificar.stock = stock;
-    if (categoria) datosAModificar.categoria = categoria;
-    if (subcategoria) datosAModificar.subcategoria = subcategoria;
+    if (categoria !== undefined) datosAModificar.categoria = categoria;
+    if (subcategoria !== undefined) datosAModificar.subcategoria = subcategoria;
 
     // Si el usuario subió una imagen nueva, la pisamos
     if (req.file) {
       datosAModificar.imagen = req.file.filename;
     }
 
-    await Producto.update(datosAModificar, {
-      where: { id },
-    });
+    const producto = await Producto.findByPk(id);
+    if (!producto) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    await producto.update(datosAModificar);
 
     res.redirect("/productos");
   } catch (error) {
@@ -115,7 +125,23 @@ const reactivarProducto = async (req, res) => {
     res.status(500).send("Error al reactivar el producto");
   }
 };
+// Función exclusiva para el frontend (Autoservicio)
+const traerProductosAPI = async (req, res) => {
+  try {
+    // Buscamos solo los productos que estén activos
+    const productos = await Producto.findAll({
+      where: {
+        activo: true // Ajustá este nombre si en tu base de datos la columna se llama distinto (ej: estado, disponible)
+      }
+    });
 
+    // En vez de un res.render, devolvemos un JSON
+    res.json(productos);
+  } catch (error) {
+    console.error("Error al obtener productos para la API:", error);
+    res.status(500).json({ error: "Ocurrió un error en el servidor" });
+  }
+};
 module.exports = {
   traerProductos,
   mostrarFormularioNuevo,
@@ -124,4 +150,5 @@ module.exports = {
   modificarProductoPorId,
   desactivarProducto,
   reactivarProducto,
+  traerProductosAPI,
 };

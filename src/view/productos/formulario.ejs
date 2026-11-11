@@ -41,7 +41,11 @@
 
             <div class="form-group">
                 <label for="categoria">Categoría:</label>
-                <input type="text" id="categoria" name="categoria" value="<%= typeof producto !== 'undefined' ? producto.categoria : '' %>" required>
+                <select id="categoria" name="categoria" required>
+                    <option value="">Seleccioná una categoría</option>
+                    <option value="perifericos" <%= typeof producto !== 'undefined' && producto.categoria === 'perifericos' ? 'selected' : '' %>>Periféricos</option>
+                    <option value="sillas" <%= typeof producto !== 'undefined' && producto.categoria === 'sillas' ? 'selected' : '' %>>Sillas</option>
+                </select>
             </div>
 
             <div class="form-group">
