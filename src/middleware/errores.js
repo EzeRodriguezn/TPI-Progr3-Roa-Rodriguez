@@ -1,20 +1,26 @@
 const manejadorErrores = (error, req, res, next) => {
-    console.error(error.stack);
+  if (res.headersSent) {
+    return next(error);
+  }
 
-    const codigoEstado = error.status || 500;
-    const mensaje = error.message || 'Error interno del servidor';
+  console.error(error);
 
-    if (req.originalUrl.startsWith('/api')) {
-        return res.status(codigoEstado).json({
-            error: true,
-            mensaje: mensaje
-        });
-    }
+  const estadoSolicitado = Number(error.status || error.statusCode);
+  const codigoEstado = estadoSolicitado >= 400 && estadoSolicitado < 600
+    ? estadoSolicitado
+    : 500;
+  const esAPI = req.originalUrl.startsWith("/usuarios") ||
+    req.originalUrl.startsWith("/ventas") ||
+    (req.get("accept") || "").includes("application/json");
+  const mensaje = codigoEstado >= 500
+    ? "Ocurrió un error en el servidor"
+    : error.message || "Solicitud inválida";
 
-    res.status(codigoEstado).render('error', {
-        mensaje: mensaje,
-        estado: codigoEstado
-    });
+  if (esAPI) {
+    return res.status(codigoEstado).json({ error: mensaje });
+  }
+
+  return res.status(codigoEstado).send(mensaje);
 };
 
 module.exports = manejadorErrores;

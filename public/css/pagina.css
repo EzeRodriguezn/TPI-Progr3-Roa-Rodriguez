@@ -1,0 +1,35 @@
+
+:root {
+  --bg-principal: #f8f9fa;
+  --bg-card: #ffffff;
+  --text-principal: #212529;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  --primary-color: #0d6efd;
+  --accent-color: #198754;
+}
+
+[data-theme="dark"] {
+  --bg-principal: #121212;
+  --bg-card: #1e1e1e;
+  --text-principal: #e0e0e0;
+  --text-muted: #a0a0a0;
+  --border-color: #333333;
+  --primary-color: #3d8bfd;
+  --accent-color: #25c974;
+}
+
+body {
+  background-color: var(--bg-principal);
+  color: var(--text-principal);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.card, .modal-content, .table, .list-group-item {
+  background-color: var(--bg-card) !important;
+  color: var(--text-principal) !important;
+  border-color: var(--border-color) !important;
+}
