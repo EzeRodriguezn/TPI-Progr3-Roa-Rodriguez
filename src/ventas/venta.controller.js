@@ -1,79 +1,253 @@
-const { Op } = require("sequelize");
-const { Venta, Producto, ProductoVentas } = require("../database/relaciones");
+const sequelize = require("../database/sequelize");
+const { Usuario, Venta, Producto, ProductoVentas } = require("../database/relaciones");
 
-const crearVenta = async (req, res) => {
-  const { total, idUsuario } = req.body;
+const registrarVentaAPI = async (req, res) => {
+  try {
+    const body = req.body || {};
+    const idUsuario = Number(body.idUsuario ?? 1);
+    const carrito = body.carrito;
 
-  const ventaCreada = await Venta.create({
-    total: total,
-    idUsuario: idUsuario, // Este es el ID del cajero que hace la venta
-  });
+    if (!Number.isSafeInteger(idUsuario) || idUsuario <= 0) {
+      return res.status(400).json({ error: "idUsuario debe ser un entero positivo" });
+    }
+    if (!Array.isArray(carrito) || carrito.length === 0) {
+      return res.status(400).json({ error: "carrito debe contener al menos un producto" });
+    }
 
-  res.send(ventaCreada);
-};
+    const cantidades = new Map();
+    for (const item of carrito) {
+      const idProducto = Number(item?.idProducto);
+      const cantidad = Number(item?.cantidad);
+      if (!Number.isSafeInteger(idProducto) || idProducto <= 0 ||
+          !Number.isSafeInteger(cantidad) || cantidad <= 0) {
+        return res.status(400).json({
+          error: "Cada producto debe tener idProducto y cantidad como enteros positivos",
+        });
+      }
 
-const agregarProductoVenta = async (req, res) => {
-  const { idVenta, idProducto, cantidad, precio_historico } = req.body;
+      const cantidadTotal = (cantidades.get(idProducto) || 0) + cantidad;
+      if (!Number.isSafeInteger(cantidadTotal)) {
+        return res.status(400).json({ error: "La cantidad solicitada no es válida" });
+      }
+      cantidades.set(idProducto, cantidadTotal);
+    }
 
-  const venta = await Venta.findByPk(idVenta);
-  const producto = await Producto.findByPk(idProducto);
+    const resultado = await sequelize.transaction(async (transaction) => {
+      const usuario = await Usuario.findByPk(idUsuario, { transaction });
+      if (!usuario) {
+        return { status: 404, error: "Usuario no encontrado" };
+      }
 
-  if (venta && producto) {
-    const relacion = await ProductoVentas.create({
-      idVenta: idVenta,
-      idProducto: idProducto,
-      cantidad: cantidad,
-      precio_historico: precio_historico,
+      const idsProducto = [...cantidades.keys()];
+      const productos = await Producto.findAll({
+        where: { id: idsProducto, activo: true },
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (productos.length !== idsProducto.length) {
+        return { status: 400, error: "El carrito contiene productos inexistentes o inactivos" };
+      }
+
+      let totalCentavos = 0;
+      const detalles = productos.map((producto) => {
+        const precio = String(producto.precio);
+        if (!/^\d+(?:\.\d{1,2})?$/.test(precio)) {
+          throw new Error(`Precio inválido para el producto ${producto.id}`);
+        }
+
+        const [entero, decimales = ""] = precio.split(".");
+        const precioCentavos = Number(entero) * 100 + Number(decimales.padEnd(2, "0"));
+        const cantidad = cantidades.get(producto.id);
+        totalCentavos += precioCentavos * cantidad;
+        if (!Number.isSafeInteger(totalCentavos) || totalCentavos > 9_999_999_999) {
+          return null;
+        }
+
+        return { producto, cantidad, precio: (precioCentavos / 100).toFixed(2) };
+      });
+
+      if (detalles.includes(null)) {
+        return { status: 400, error: "El total de la venta excede el máximo permitido" };
+      }
+
+      const nuevaVenta = await Venta.create({
+        total: (totalCentavos / 100).toFixed(2),
+        idUsuario,
+      }, { transaction });
+
+      for (const detalle of detalles) {
+        await nuevaVenta.addProducto(detalle.producto, {
+          through: {
+            cantidad: detalle.cantidad,
+            precio_historico: detalle.precio,
+          },
+          transaction,
+        });
+      }
+
+      return { idVenta: nuevaVenta.id };
     });
-    res.send({ ok: true });
-  } else {
-    res.send({ ok: false });
+
+    if (resultado.error) {
+      return res.status(resultado.status).json({ error: resultado.error });
+    }
+
+    res.status(201).json({
+      mensaje: "Venta registrada con éxito",
+      idVenta: resultado.idVenta,
+    });
+  } catch (error) {
+    console.error("Error al registrar la venta:", error);
+    res.status(500).json({ error: "Error al registrar la venta" });
   }
 };
 
-const traerVentas = async (req, res) => {
-  // Ordenamos por fecha de creación descendente (las más nuevas primero)
-  const ventas = await Venta.findAll({ order: [["createdAt", "DESC"]] });
-
-  res.send(ventas);
+const idPositivo = (valor) => {
+  const id = Number(valor);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
 };
 
-const traerVentaPorId = async (req, res) => {
-  const id = req.params.id;
+const montoValido = (valor) =>
+  (typeof valor === "number" || typeof valor === "string") &&
+  /^\d+(?:\.\d{1,2})?$/.test(String(valor)) &&
+  Number.isFinite(Number(valor));
 
-  const venta = await Venta.findByPk(id);
+const objetoValido = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
 
-  res.send(venta);
+const traerVentas = async (req, res, next) => {
+  try {
+    res.json(await Venta.findAll({ order: [["createdAt", "DESC"]] }));
+  } catch (error) {
+    next(error);
+  }
 };
 
-const modificarVentaPorId = async (req, res) => {
-  const { total } = req.body;
-  const { id } = req.params;
-
-  let datosAModificar = {};
-
-  if (total) {
-    datosAModificar.total = total;
+const traerVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
   }
 
-  const modificado = await Venta.update(datosAModificar, {
-    where: { id },
-  });
-
-  res.send(modificado);
+  try {
+    const venta = await Venta.findByPk(id);
+    if (!venta) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json(venta);
+  } catch (error) {
+    next(error);
+  }
 };
 
-const eliminarVentaPorId = async (req, res) => {
-  const eliminado = await Venta.destroy({ where: { id: req.params.id } });
+const eliminarVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
 
-  res.send(eliminado);
+  try {
+    const eliminadas = await Venta.destroy({ where: { id } });
+    if (eliminadas === 0) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json({ eliminadas });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const crearVenta = async (req, res, next) => {
+  const body = req.body;
+  if (!objetoValido(body) || !montoValido(body.total) || !idPositivo(body.idUsuario)) {
+    return res.status(400).json({ error: "total e idUsuario válidos son obligatorios" });
+  }
+
+  try {
+    const venta = await Venta.create({
+      total: body.total,
+      idUsuario: idPositivo(body.idUsuario),
+    });
+    res.status(201).json(venta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const agregarProductoVenta = async (req, res, next) => {
+  const body = req.body;
+  if (!objetoValido(body) ||
+      !idPositivo(body.VentaId) ||
+      !idPositivo(body.ProductoId) ||
+      !idPositivo(body.cantidad) ||
+      !montoValido(body.precio_historico)) {
+    return res.status(400).json({
+      error: "VentaId, ProductoId, cantidad y precio_historico deben ser válidos",
+    });
+  }
+
+  try {
+    const detalle = await ProductoVentas.create({
+      VentaId: idPositivo(body.VentaId),
+      ProductoId: idPositivo(body.ProductoId),
+      cantidad: idPositivo(body.cantidad),
+      precio_historico: body.precio_historico,
+    });
+    res.status(201).json(detalle);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const modificarVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  const body = req.body;
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+  if (!objetoValido(body)) {
+    return res.status(400).json({ error: "El cuerpo de la solicitud debe ser un objeto" });
+  }
+
+  const camposPermitidos = ["total", "idUsuario"];
+  if (Object.keys(body).some((campo) => !camposPermitidos.includes(campo))) {
+    return res.status(400).json({ error: "La solicitud contiene campos no permitidos" });
+  }
+
+  const datosAModificar = {};
+  if (body.total !== undefined) {
+    if (!montoValido(body.total)) {
+      return res.status(400).json({ error: "total debe ser un monto válido" });
+    }
+    datosAModificar.total = body.total;
+  }
+  if (body.idUsuario !== undefined) {
+    const idUsuario = idPositivo(body.idUsuario);
+    if (!idUsuario) {
+      return res.status(400).json({ error: "idUsuario debe ser un entero positivo" });
+    }
+    datosAModificar.idUsuario = idUsuario;
+  }
+  if (Object.keys(datosAModificar).length === 0) {
+    return res.status(400).json({ error: "No se enviaron campos para modificar" });
+  }
+
+  try {
+    const [actualizadas] = await Venta.update(datosAModificar, { where: { id } });
+    if (actualizadas === 0) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json({ actualizadas });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
-  crearVenta,
-  agregarProductoVenta,
-  traerVentas,
-  traerVentaPorId,
-  modificarVentaPorId,
-  eliminarVentaPorId,
+  registrarVentaAPI, 
+  traerVentas, 
+  traerVentaPorId, 
+  eliminarVentaPorId, 
+  crearVenta, 
+  agregarProductoVenta, 
+  modificarVentaPorId
 };
