@@ -29,7 +29,8 @@ function inyectarLayout() {
               <a class="nav-link" href="${rutaBase}productos/productos.html">Productos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="${rutaBase}carrito/carrito.html">
+              <!-- AQUÍ ESTÁ EL CAMBIO: Ahora apunta a ticket/ticket.html -->
+              <a class="nav-link" href="${rutaBase}ticket/ticket.html">
                 Carrito <span id="cart-counter" data-cart-counter class="badge bg-primary rounded-pill">0</span>
               </a>
             </li>
@@ -49,7 +50,11 @@ function inyectarLayout() {
   `;
 
   document.body.prepend(header);
-  actualizarContadorCarrito();
+  
+  // Verificación por si la función no existe en la página actual
+  if (typeof actualizarContadorCarrito === 'function') {
+    actualizarContadorCarrito();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', inyectarLayout);
