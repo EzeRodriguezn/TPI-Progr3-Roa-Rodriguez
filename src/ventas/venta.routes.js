@@ -7,11 +7,7 @@ const {
   modificarVentaPorId,
   eliminarVentaPorId,
   registrarVentaAPI, 
-<<<<<<< HEAD
-  exportarExcelVentas // <-- Importamos la función de Excel
-=======
   exportarExcelVentas 
->>>>>>> front
 } = require("./venta.controller");
 
 const ventaRouter = express.Router();
