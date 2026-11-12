@@ -164,6 +164,8 @@ body.pantalla-bienvenida .card-bienvenida {
   display: flex;
   align-items: center;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+
+
 }
 
 /* Adaptación automática al activar Modo Oscuro */
@@ -187,4 +189,11 @@ body.dark-mode .xp-window-tab,
   .xp-tray {
     display: none;
   }
+}
+.xp-tray {
+  gap: 12px;
+}
+
+.xp-tray-sep {
+  opacity: 0.6;
 }
