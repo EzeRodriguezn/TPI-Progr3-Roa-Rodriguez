@@ -89,3 +89,102 @@ body.pantalla-bienvenida .card-bienvenida {
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.25) !important;
 }
+
+/* --- BARRA DE TAREAS INFERIOR WINDOWS XP --- */
+.xp-taskbar {
+  width: 100%;
+  height: 46px;
+  background: linear-gradient(180deg, #3168d5 0%, #4993e6 9%, #235cdc 18%, #2258d7 92%, #1941a5 100%);
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  user-select: none;
+  z-index: 1030;
+  overflow: hidden;
+}
+
+.xp-start-btn {
+  height: 100%;
+  background: linear-gradient(180deg, #52b848 0%, #3d9e35 15%, #2f8b28 85%, #246e1e 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.35rem;
+  letter-spacing: 0.4px;
+  padding: 0 18px 0 12px;
+  border-radius: 0 26px 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55), 2px 0 4px rgba(0, 0, 0, 0.35);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+
+.xp-win-logo {
+  width: 26px !important;
+  height: 26px !important;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.xp-window-tab {
+  height: 36px;
+  margin-left: 14px;
+  padding: 0 20px;
+  background: linear-gradient(180deg, #1b49b3 0%, #1e52c6 20%, #1945a8 90%, #143687 100%);
+  border: 1px solid #102d73;
+  border-radius: 4px;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 260px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.xp-tab-logo {
+  width: 19px;
+  height: 19px;
+  object-fit: contain;
+  background-color: #000000;
+  border: 1.5px solid #000000;
+  border-radius: 3px;
+}
+
+
+.xp-tray {
+  margin-left: auto;
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 500;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+/* Adaptación automática al activar Modo Oscuro */
+body.dark-mode .xp-taskbar,
+[data-theme="dark"] .xp-taskbar {
+  background: linear-gradient(180deg, #1b2a4a 0%, #243963 10%, #142038 90%, #0d1526 100%);
+}
+
+body.dark-mode .xp-start-btn,
+[data-theme="dark"] .xp-start-btn {
+  background: linear-gradient(180deg, #2d6e32 0%, #215425 20%, #18401b 90%, #112e13 100%);
+}
+
+body.dark-mode .xp-window-tab,
+[data-theme="dark"] .xp-window-tab {
+  background: linear-gradient(180deg, #111b30 0%, #16233d 20%, #0f192b 90%, #0a101c 100%);
+  border-color: #080d17;
+}
+
+@media (max-width: 576px) {
+  .xp-tray {
+    display: none;
+  }
+}
