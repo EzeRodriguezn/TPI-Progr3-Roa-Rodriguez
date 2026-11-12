@@ -28,6 +28,7 @@ body.dark-mode input {
   border: 1px solid #555555 !important;
 }
 
+/* Aclarar el color del texto de relleno ("Tu nombre...") */
 body.dark-mode input::placeholder {
   color: #bbbbbb !important;
 }

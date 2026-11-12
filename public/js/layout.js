@@ -30,7 +30,7 @@ function inyectarLayout() {
             </li>
             <li class="nav-item">
               <a class="nav-link" href="${rutaBase}carrito/carrito.html">
-                Carrito <span id="cart-counter" class="badge bg-primary rounded-pill">0</span>
+                Carrito <span id="cart-counter" data-cart-counter class="badge bg-primary rounded-pill">0</span>
               </a>
             </li>
           </ul>
