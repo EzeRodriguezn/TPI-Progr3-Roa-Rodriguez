@@ -71,3 +71,21 @@ main {
 body.dark-mode .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
+
+/* Fondo exclusivo para la pantalla de bienvenida */
+body.pantalla-bienvenida {
+  background-image: var(--bg-bienvenida);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transition: background-image 0.4s ease-in-out;
+}
+
+/* Tarjeta con efecto vidrio sutil sobre el wallpaper */
+body.pantalla-bienvenida .card-bienvenida {
+  background-color: var(--bg-card-glass) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+}

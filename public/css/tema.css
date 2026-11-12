@@ -78,3 +78,41 @@ body.dark-mode .page-item.disabled .page-link {
   color: #666666 !important;
   border-color: #333333 !important;
 }
+
+:root {
+  --bg-principal: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-card-glass: rgba(255, 255, 255, 0.88);
+  --text-principal: #212529;
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  --primary-color: #0d6efd;
+  --bg-bienvenida: url('../img/windows xp tema claro.jpg');
+}
+
+[data-theme="dark"],
+[data-bs-theme="dark"] {
+  --bg-principal: #121212;
+  --bg-card: #1e1e1e;
+  --bg-card-glass: rgba(24, 28, 36, 0.85);
+  --text-principal: #e0e0e0;
+  --text-muted: #a0a0a0;
+  --border-color: #333333;
+  --primary-color: #3d8bfd;
+  --bg-bienvenida: url('../img/windows xp tema oscuro.jpeg');
+}
+
+body {
+  background-color: var(--bg-principal);
+  color: var(--text-principal);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.card, .modal-content, .table {
+  background-color: var(--bg-card) !important;
+  color: var(--text-principal) !important;
+  border-color: var(--border-color) !important;
+}
