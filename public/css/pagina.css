@@ -28,6 +28,16 @@ body {
   flex-direction: column;
 }
 
+main {
+  flex: 1;
+}
+
+.producto-img {
+  height: 180px;
+  object-fit: contain;
+  padding: 1rem;
+}
+
 .card, .modal-content, .table, .list-group-item {
   background-color: var(--bg-card) !important;
   color: var(--text-principal) !important;
