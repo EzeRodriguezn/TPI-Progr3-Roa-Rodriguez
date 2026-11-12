@@ -1,16 +1,20 @@
 const { z } = require("zod");
 
+// Cambiamos 'email' por 'username' en el esquema
 const esquemaLogin = z.object({
-  username: z.string().min(1, "El usuario es obligatorio"),
+  username: z.string().min(1, "El usuario es obligatorio").email("El formato del usuario no es válido (debe ser un correo)"),
   password: z.string().min(1, "La contraseña no puede estar vacía"),
 });
 
 const validarLogin = (req, res, next) => {
   const body = req.body && typeof req.body === "object" ? req.body : {};
+  
+  // Aseguramos que el dato se llame 'username', venga de donde venga
   const datosLogin = {
     ...body,
     username: body.username ?? body.email,
   };
+  
   const resultado = esquemaLogin.safeParse(datosLogin);
 
   if (!resultado.success) {
@@ -28,6 +32,7 @@ const validarLogin = (req, res, next) => {
     return res.status(400).render("login", { error: mensajesDeError });
   }
 
+  // Ahora req.body solo tendrá { username: "...", password: "..." }
   req.body = resultado.data;
   next();
 };
