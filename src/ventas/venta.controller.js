@@ -1,5 +1,5 @@
 const sequelize = require("../database/sequelize");
-const { Usuario, Venta, Producto } = require("../database/relaciones");
+const { Usuario, Venta, Producto, ProductoVentas } = require("../database/relaciones");
 
 const registrarVentaAPI = async (req, res) => {
   try {
@@ -102,13 +102,145 @@ const registrarVentaAPI = async (req, res) => {
   }
 };
 
-// CRUD original comprimido
-const traerVentas = async (req, res) => res.send(await Venta.findAll({ order: [["createdAt", "DESC"]] }));
-const traerVentaPorId = async (req, res) => res.send(await Venta.findByPk(req.params.id));
-const eliminarVentaPorId = async (req, res) => res.send(await Venta.destroy({ where: { id: req.params.id } }));
-const crearVenta = async (req, res) => res.send(await Venta.create(req.body));
-const agregarProductoVenta = async (req, res) => res.send(await ProductoVentas.create(req.body));
-const modificarVentaPorId = async (req, res) => res.send(await Venta.update(req.body, { where: { id: req.params.id } }));
+const idPositivo = (valor) => {
+  const id = Number(valor);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+};
+
+const montoValido = (valor) =>
+  (typeof valor === "number" || typeof valor === "string") &&
+  /^\d+(?:\.\d{1,2})?$/.test(String(valor)) &&
+  Number.isFinite(Number(valor));
+
+const objetoValido = (valor) => valor && typeof valor === "object" && !Array.isArray(valor);
+
+const traerVentas = async (req, res, next) => {
+  try {
+    res.json(await Venta.findAll({ order: [["createdAt", "DESC"]] }));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const traerVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+
+  try {
+    const venta = await Venta.findByPk(id);
+    if (!venta) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json(venta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const eliminarVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+
+  try {
+    const eliminadas = await Venta.destroy({ where: { id } });
+    if (eliminadas === 0) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json({ eliminadas });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const crearVenta = async (req, res, next) => {
+  const body = req.body;
+  if (!objetoValido(body) || !montoValido(body.total) || !idPositivo(body.idUsuario)) {
+    return res.status(400).json({ error: "total e idUsuario válidos son obligatorios" });
+  }
+
+  try {
+    const venta = await Venta.create({
+      total: body.total,
+      idUsuario: idPositivo(body.idUsuario),
+    });
+    res.status(201).json(venta);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const agregarProductoVenta = async (req, res, next) => {
+  const body = req.body;
+  if (!objetoValido(body) ||
+      !idPositivo(body.VentaId) ||
+      !idPositivo(body.ProductoId) ||
+      !idPositivo(body.cantidad) ||
+      !montoValido(body.precio_historico)) {
+    return res.status(400).json({
+      error: "VentaId, ProductoId, cantidad y precio_historico deben ser válidos",
+    });
+  }
+
+  try {
+    const detalle = await ProductoVentas.create({
+      VentaId: idPositivo(body.VentaId),
+      ProductoId: idPositivo(body.ProductoId),
+      cantidad: idPositivo(body.cantidad),
+      precio_historico: body.precio_historico,
+    });
+    res.status(201).json(detalle);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const modificarVentaPorId = async (req, res, next) => {
+  const id = idPositivo(req.params.id);
+  const body = req.body;
+  if (!id) {
+    return res.status(400).json({ error: "El id debe ser un entero positivo" });
+  }
+  if (!objetoValido(body)) {
+    return res.status(400).json({ error: "El cuerpo de la solicitud debe ser un objeto" });
+  }
+
+  const camposPermitidos = ["total", "idUsuario"];
+  if (Object.keys(body).some((campo) => !camposPermitidos.includes(campo))) {
+    return res.status(400).json({ error: "La solicitud contiene campos no permitidos" });
+  }
+
+  const datosAModificar = {};
+  if (body.total !== undefined) {
+    if (!montoValido(body.total)) {
+      return res.status(400).json({ error: "total debe ser un monto válido" });
+    }
+    datosAModificar.total = body.total;
+  }
+  if (body.idUsuario !== undefined) {
+    const idUsuario = idPositivo(body.idUsuario);
+    if (!idUsuario) {
+      return res.status(400).json({ error: "idUsuario debe ser un entero positivo" });
+    }
+    datosAModificar.idUsuario = idUsuario;
+  }
+  if (Object.keys(datosAModificar).length === 0) {
+    return res.status(400).json({ error: "No se enviaron campos para modificar" });
+  }
+
+  try {
+    const [actualizadas] = await Venta.update(datosAModificar, { where: { id } });
+    if (actualizadas === 0) {
+      return res.status(404).json({ error: "Venta no encontrada" });
+    }
+    res.json({ actualizadas });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   registrarVentaAPI, 

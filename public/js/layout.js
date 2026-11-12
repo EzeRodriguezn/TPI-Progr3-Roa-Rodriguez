@@ -37,7 +37,7 @@ function inyectarLayout() {
 
           <div class="d-flex align-items-center gap-2">
             <button id="btn-tema" onclick="alternarTema()" class="btn btn-outline-secondary btn-sm">
-              🌙 Modo Oscuro
+              🌙
             </button>
             <a href="http://localhost:3000/usuarios/login" class="btn btn-outline-primary btn-sm">
               Acceso Admin
