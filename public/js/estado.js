@@ -59,7 +59,6 @@ function calcularTotalCarrito() {
   return Math.round(total * 100) / 100;
 }
 
-// El ticket se guarda al confirmar la compra y se muestra en /ticket/ticket.html
 function guardarTicket(ticket) {
   sessionStorage.setItem('ticket', JSON.stringify(ticket));
 }
