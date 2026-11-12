@@ -2,7 +2,7 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 
-const directorioImagenes = path.join(__dirname, '..', '..', 'public', 'descargas');
+const directorioImagenes = path.join(__dirname, '..', '..', 'public', 'img');
 
 const almacenamiento = multer.diskStorage({
     destination: (peticion, archivo, callback) => {
