@@ -93,7 +93,7 @@ body.pantalla-bienvenida .card-bienvenida {
 /* --- BARRA DE TAREAS INFERIOR WINDOWS XP --- */
 .xp-taskbar {
   width: 100%;
-  height: 46px;
+  height: 26px;
   background: linear-gradient(180deg, #3168d5 0%, #4993e6 9%, #235cdc 18%, #2258d7 92%, #1941a5 100%);
   display: flex;
   align-items: center;
@@ -109,39 +109,39 @@ body.pantalla-bienvenida .card-bienvenida {
   color: #ffffff;
   font-weight: 700;
   font-style: italic;
-  font-size: 1.35rem;
-  letter-spacing: 0.4px;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
   padding: 0 18px 0 12px;
-  border-radius: 0 26px 16px 0;
+  border-radius: 0 14px 14px 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55), 2px 0 4px rgba(0, 0, 0, 0.35);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.65);
   cursor: default;
 }
 
 .xp-win-logo {
-  width: 26px !important;
-  height: 26px !important;
+  width: 18px !important;
+  height: 22px !important;
   filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.4));
 }
 
 .xp-window-tab {
-  height: 36px;
-  margin-left: 14px;
-  padding: 0 20px;
+  height: 20px;
+  margin-left: 12px;
+  padding: 0 18px;
   background: linear-gradient(180deg, #1b49b3 0%, #1e52c6 20%, #1945a8 90%, #143687 100%);
   border: 1px solid #102d73;
-  border-radius: 4px;
+  border-radius: 3px;
   box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2);
   color: #ffffff;
-  font-size: 1.08rem;
-  font-weight: 500;
+  font-size: 0.84rem;
+  /*font-weight: 500;*/
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-width: 260px;
+  gap: 8px;
+  min-width: 195px;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
 }
 
@@ -158,12 +158,14 @@ body.pantalla-bienvenida .card-bienvenida {
 .xp-tray {
   margin-left: auto;
   color: #ffffff;
-  font-size: 1.08rem;
+  font-size: 0.80rem;
   font-weight: 500;
   padding: 0 24px;
   display: flex;
   align-items: center;
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+
+
 }
 
 /* Adaptación automática al activar Modo Oscuro */
@@ -187,4 +189,11 @@ body.dark-mode .xp-window-tab,
   .xp-tray {
     display: none;
   }
+}
+.xp-tray {
+  gap: 12px;
+}
+
+.xp-tray-sep {
+  opacity: 0.6;
 }
