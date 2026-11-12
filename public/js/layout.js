@@ -12,7 +12,7 @@ function inyectarLayout() {
       <div class="container-fluid">
         <a class="navbar-brand d-flex align-items-center gap-2" href="${rutaBase}index.html">
           <img src="${rutaBase}img/logo.svg" alt="Logo" width="30" height="30" onerror="this.style.display='none'">
-          <span class="fw-bold">TechPoint Autoservicio</span>
+          <span class="fw-bold">RTech Autoservicio</span>
         </a>
 
         <span class="badge bg-secondary d-none d-md-inline-block me-3">
