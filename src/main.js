@@ -72,7 +72,7 @@ app.use(manejadorErrores);
 
 const PORT = Number(process.env.PORT || 3000);
 
-sequelize.sync({ alter: true })
+sequelize.sync()
   .then(() => {
     console.log("Conexion establecida!!");
     app.listen(PORT, () => {
