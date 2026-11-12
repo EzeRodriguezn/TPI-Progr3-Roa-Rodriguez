@@ -46,6 +46,28 @@ function eliminarDelCarrito(productoId) {
   guardarCarrito(carrito);
 }
 
+function vaciarCarrito() {
+  guardarCarrito([]);
+}
+
+function contarItemsCarrito() {
+  return getCarrito().reduce((sum, item) => sum + item.cantidad, 0);
+}
+
+function calcularTotalCarrito() {
+  const total = getCarrito().reduce((sum, item) => sum + Number(item.precio) * item.cantidad, 0);
+  return Math.round(total * 100) / 100;
+}
+
+// El ticket se guarda al confirmar la compra y se muestra en /ticket/ticket.html
+function guardarTicket(ticket) {
+  sessionStorage.setItem('ticket', JSON.stringify(ticket));
+}
+
+function getTicket() {
+  return JSON.parse(sessionStorage.getItem('ticket'));
+}
+
 function actualizarContadorCarrito() {
   const total = getCarrito().reduce((sum, item) => sum + item.cantidad, 0);
   document.querySelectorAll('[data-cart-counter]').forEach((badge) => {

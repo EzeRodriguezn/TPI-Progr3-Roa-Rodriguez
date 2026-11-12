@@ -92,24 +92,6 @@ function tarjeta(p) {
     </div>`;
 }
 
-function esc(valor) {
-  return String(valor ?? "").replace(/[&<>"']/g, (caracter) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[caracter]);
-}
-
-function formatearPrecio(valor) {
-  const precio = Number(valor);
-  return Number.isFinite(precio)
-    ? new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(precio)
-    : "Precio no disponible";
-}
-
-// EVENTOS (delegación: un solo listener por contenedor)
 grilla.addEventListener("click", (ev) => {
   const boton = ev.target.closest("[data-accion]");
   if (!boton) return;
