@@ -64,8 +64,6 @@ function filaItem(item) {
       </div>
     </li>`;
 }
-
-// ---------- EVENTOS DE LA LISTA (delegación) ----------
 lista.addEventListener("click", (ev) => {
   const boton = ev.target.closest("[data-accion]");
   if (!boton) return;
@@ -79,7 +77,7 @@ lista.addEventListener("click", (ev) => {
       if (item.cantidad < (Number(item.stock) || 0)) actualizarCantidadCarrito(id, 1);
       break;
     case "menos":
-      actualizarCantidadCarrito(id, -1); // si llega a 0, el producto sale del carrito
+      actualizarCantidadCarrito(id, -1); 
       break;
     case "eliminar":
       eliminarDelCarrito(id);
@@ -88,7 +86,6 @@ lista.addEventListener("click", (ev) => {
   render();
 });
 
-// ---------- FINALIZAR COMPRA ----------
 document.getElementById("btn-finalizar").addEventListener("click", () => {
   const cantidad = contarItemsCarrito();
   if (cantidad === 0) return;
@@ -117,21 +114,18 @@ async function confirmarCompra() {
     const total = calcularTotalCarrito();
     const nombreCliente = getNombreCliente();
 
-    // Lo que se envía al backend (ajustar los nombres de campos si tu API usa otros)
-    const venta = {
+const venta = {
       nombreCliente,
       fecha,
       total,
-      productos: carrito.map((i) => ({
-        id: i.id,
+      carrito: carrito.map((i) => ({
+        idProducto: i.id, 
         cantidad: i.cantidad,
         precioUnitario: Number(i.precio),
       })),
     };
-
     const respuesta = await registrarVentaAPI(venta);
 
-    // Se guarda el ticket ANTES de vaciar el carrito
     guardarTicket({
       numero: respuesta?.id ?? respuesta?.venta?.id ?? null,
       empresa: CONFIG.NOMBRE_EMPRESA,
@@ -149,7 +143,6 @@ async function confirmarCompra() {
     setCargando(false);
   }
 }
-
 function setCargando(cargando) {
   document.getElementById("spinner-confirmar").classList.toggle("d-none", !cargando);
   document.getElementById("texto-confirmar").textContent = cargando ? "Procesando..." : "Confirmar compra";

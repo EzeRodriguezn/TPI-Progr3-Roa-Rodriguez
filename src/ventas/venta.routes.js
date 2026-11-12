@@ -6,17 +6,19 @@ const {
   traerVentaPorId,
   modificarVentaPorId,
   eliminarVentaPorId,
-  registrarVentaAPI // Importamos la función nueva
+  registrarVentaAPI, 
+  exportarExcelVentas 
 } = require("./venta.controller");
 
 const ventaRouter = express.Router();
 
-ventaRouter.post("/api", registrarVentaAPI);
+ventaRouter.post("/", registrarVentaAPI);
 
 ventaRouter.use(require("../middleware/autenticacion").protegerRuta);
 
+ventaRouter.get("/exportar/excel", exportarExcelVentas);
 ventaRouter.get("/", traerVentas);
-ventaRouter.post("/", crearVenta);
+ventaRouter.post("/basico", crearVenta); 
 ventaRouter.post("/producto", agregarProductoVenta);
 ventaRouter.get("/:id", traerVentaPorId);
 ventaRouter.put("/:id", modificarVentaPorId);
