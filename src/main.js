@@ -32,7 +32,11 @@ app.use((req, res, next) => {
 });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/imagenes", express.static(path.join(__dirname, "..", "public", "descargas")));
+app.use(
+  "/imagenes",
+  express.static(path.join(__dirname, "..", "public", "descargas")),
+  express.static(path.join(__dirname, "..", "public", "img"))
+);
 app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 app.set("view engine", "ejs");

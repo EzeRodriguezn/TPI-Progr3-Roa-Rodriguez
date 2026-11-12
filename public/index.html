@@ -18,7 +18,8 @@
       
       <form id="form-bienvenida" action="javascript:void(0);">
         <div class="mb-3">
-          <input type="text" id="input-nombre" class="form-control form-control-lg text-center" placeholder="Tu nombre..." required autocomplete="off">
+          <input type="text" id="input-nombre" placeholder="Tu nombre..." class="form-control" 
+          oninput="this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '')">   
         </div>
         <button type="submit" id="btn-continuar" class="btn btn-primary btn-lg w-100">Continuar a Productos</button>
       </form>
