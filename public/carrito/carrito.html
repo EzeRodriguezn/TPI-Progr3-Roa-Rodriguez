@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carrito - TechPoint Autoservicio</title>
+  <link rel="icon" type="image/svg+xml" href="../img/logo.svg">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../css/tema.css">
+  <link rel="stylesheet" href="../css/pagina.css">
+</head>
+<body data-pagina="carrito">
+  <main class="container py-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <h1 class="h3 mb-0"><i class="bi bi-cart3"></i> Tu carrito</h1>
+      <span class="fw-bold text-primary fs-5" id="nombre-cliente"></span>
+    </div>
+
+    <!-- Carrito vacío -->
+    <div id="carrito-vacio" class="card shadow-sm text-center p-5 d-none">
+      <i class="bi bi-cart-x display-3 texto-suave"></i>
+      <h2 class="h5 mt-3">Tu carrito está vacío</h2>
+      <p class="texto-suave">Todavía no agregaste ningún producto.</p>
+      <div>
+        <a href="../productos/productos.html" class="btn btn-primary">Ver productos</a>
+      </div>
+    </div>
+
+    <!-- Carrito con productos -->
+    <div id="carrito-contenido" class="row g-4 d-none">
+      <div class="col-lg-8">
+        <ul class="list-group shadow-sm" id="lista-carrito"></ul>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card shadow-sm resumen-carrito">
+          <div class="card-body">
+            <h2 class="h5 mb-3">Resumen</h2>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Productos</span>
+              <span id="resumen-cantidad">0</span>
+            </div>
+            <div class="d-flex justify-content-between fs-4 fw-bold border-top pt-3 mb-3">
+              <span>Total</span>
+              <span id="resumen-total"></span>
+            </div>
+            <button type="button" id="btn-finalizar" class="btn btn-success btn-lg w-100 mb-2">
+              <i class="bi bi-bag-check"></i> Finalizar compra
+            </button>
+            <a href="../productos/productos.html" class="btn btn-outline-secondary w-100">Seguir comprando</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de confirmación de compra -->
+  <div class="modal fade" id="modal-confirmar" tabindex="-1" aria-labelledby="modal-confirmar-titulo" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="modal-confirmar-titulo">Confirmar compra</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" id="btn-cerrar-modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">¿Querés confirmar tu compra, <strong id="modal-nombre"></strong>?</p>
+          <p class="mb-0">
+            Llevás <strong id="modal-cantidad"></strong> por un total de <strong id="modal-total"></strong>.
+          </p>
+          <div id="modal-error" class="alert alert-danger mt-3 mb-0 d-none" role="alert"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" id="btn-cancelar">Cancelar</button>
+          <button type="button" class="btn btn-success" id="btn-confirmar">
+            <span class="spinner-border spinner-border-sm d-none" id="spinner-confirmar" aria-hidden="true"></span>
+            <span id="texto-confirmar">Confirmar compra</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/config.js"></script>
+  <script src="../js/utils.js"></script>
+  <script src="../js/estado.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/tema.js"></script>
+  <script src="../js/layout.js"></script>
+  <script src="carrito.js"></script>
+</body>
+</html>
