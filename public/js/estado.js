@@ -47,12 +47,10 @@ function eliminarDelCarrito(productoId) {
 }
 
 function actualizarContadorCarrito() {
-  const badge = document.getElementById('cart-counter');
-  if (badge) {
-    const carrito = getCarrito();
-    const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+  const total = getCarrito().reduce((sum, item) => sum + item.cantidad, 0);
+  document.querySelectorAll('[data-cart-counter]').forEach((badge) => {
     badge.innerText = total;
-  }
+  });
 }
 
 function reiniciarSistema() {

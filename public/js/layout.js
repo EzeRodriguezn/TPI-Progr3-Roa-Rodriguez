@@ -29,15 +29,16 @@ function inyectarLayout() {
               <a class="nav-link" href="${rutaBase}productos/productos.html">Productos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="${rutaBase}carrito/carrito.html">
-                Carrito <span id="cart-counter" class="badge bg-primary rounded-pill">0</span>
+              <!-- AQUÍ ESTÁ EL CAMBIO: Ahora apunta a ticket/ticket.html -->
+              <a class="nav-link" href="${rutaBase}ticket/ticket.html">
+                Carrito <span id="cart-counter" data-cart-counter class="badge bg-primary rounded-pill">0</span>
               </a>
             </li>
           </ul>
 
           <div class="d-flex align-items-center gap-2">
             <button id="btn-tema" onclick="alternarTema()" class="btn btn-outline-secondary btn-sm">
-              🌙 Modo Oscuro
+              🌙
             </button>
             <a href="http://localhost:3000/usuarios/login" class="btn btn-outline-primary btn-sm">
               Acceso Admin
@@ -49,7 +50,11 @@ function inyectarLayout() {
   `;
 
   document.body.prepend(header);
-  actualizarContadorCarrito();
+  
+  // Verificación por si la función no existe en la página actual
+  if (typeof actualizarContadorCarrito === 'function') {
+    actualizarContadorCarrito();
+  }
 }
 
 document.addEventListener('DOMContentLoaded', inyectarLayout);
