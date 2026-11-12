@@ -29,8 +29,8 @@ function inyectarLayout() {
               <a class="nav-link" href="${rutaBase}productos/productos.html">Productos</a>
             </li>
             <li class="nav-item">
-              <!-- AQUÍ ESTÁ EL CAMBIO: Ahora apunta a ticket/ticket.html -->
-              <a class="nav-link" href="${rutaBase}ticket/ticket.html">
+              <!-- AQUÍ ESTÁ EL CAMBIO: Ahora apunta a carrito/carrito.html -->
+              <a class="nav-link" href="${rutaBase}carrito/carrito.html">
                 Carrito <span id="cart-counter" data-cart-counter class="badge bg-primary rounded-pill">0</span>
               </a>
             </li>
