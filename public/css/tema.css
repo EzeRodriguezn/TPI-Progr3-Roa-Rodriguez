@@ -1,0 +1,80 @@
+main {
+  flex: 1;
+}
+
+.product-card-img {
+  height: 180px;
+  object-fit: contain;
+  padding: 1rem;
+}
+
+/* MODO OSCURO */
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode p, 
+body.dark-mode span,
+body.dark-mode label {
+  color: #f1f1f1 !important;
+}
+body.dark-mode input {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+  border: 1px solid #555555 !important;
+}
+
+/* Aclarar el color del texto de relleno ("Tu nombre...") */
+body.dark-mode input::placeholder {
+  color: #bbbbbb !important;
+}
+
+body.dark-mode .modal-content,
+body.dark-mode .card,
+body.dark-mode .contenedor {
+  background-color: #1e1e1e;
+  border: 1px solid #333333;
+}
+body.dark-mode a,
+body.dark-mode nav a,
+body.dark-mode header a,
+body.dark-mode .nav-link,
+body.dark-mode nav button,
+body.dark-mode li {
+  color: #ffffff !important;
+}
+body.dark-mode header,
+body.dark-mode nav,
+body.dark-mode .navbar,
+body.dark-mode .bg-light {
+  background-color: #1a1a1a !important;
+  border-bottom: 1px solid #333333 !important;
+}
+
+/* --- ESTILOS DE LA PAGINACIÓN --- */
+body.dark-mode .page-link {
+  background-color: #222222 !important; 
+  color: #ffffff !important; 
+  border-color: #444444 !important; 
+}
+
+body.dark-mode .page-link:hover {
+  background-color: #333333 !important;
+  color: #f1f1f1 !important;
+}
+
+body.dark-mode .page-item.active .page-link {
+  background-color: #0d6efd !important; 
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .page-item.disabled .page-link {
+  background-color: #1a1a1a !important;
+  color: #666666 !important;
+  border-color: #333333 !important;
+}
