@@ -15,10 +15,6 @@ function inyectarLayout() {
           <span class="fw-bold">RTech Autoservicio</span>
         </a>
 
-        <span class="badge bg-secondary d-none d-md-inline-block me-3">
-          Alumnos: Roa - Rodríguez
-        </span>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navApp">
           <span class="navbar-toggler-icon"></span>
         </button>
