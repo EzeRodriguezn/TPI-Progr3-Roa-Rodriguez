@@ -1,3 +1,4 @@
+const ExcelJS = require("exceljs"); 
 const sequelize = require("../database/sequelize");
 const { Usuario, Venta, Producto, ProductoVentas } = require("../database/relaciones");
 
@@ -242,6 +243,43 @@ const modificarVentaPorId = async (req, res, next) => {
   }
 };
 
+// <-- ACÁ ESTÁ LA FUNCIÓN QUE FALTABA -->
+const exportarExcelVentas = async (req, res, next) => {
+  try {
+    const ventas = await Venta.findAll({ order: [["createdAt", "DESC"]] });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Reporte de Ventas");
+
+    worksheet.columns = [
+      { header: "ID Venta", key: "id", width: 10 },
+      { header: "ID Usuario", key: "idUsuario", width: 15 },
+      { header: "Total ($)", key: "total", width: 15 },
+      { header: "Fecha", key: "fecha", width: 25 }
+    ];
+
+    worksheet.getRow(1).font = { bold: true };
+
+    ventas.forEach(venta => {
+      worksheet.addRow({
+        id: venta.id,
+        idUsuario: venta.idUsuario,
+        total: venta.total,
+        fecha: venta.createdAt ? venta.createdAt.toLocaleString() : ""
+      });
+    });
+
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", "attachment; filename=Reporte_Ventas.xlsx");
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    console.error("Error al exportar Excel:", error);
+    res.status(500).send("Error al generar el archivo Excel");
+  }
+};
+
 module.exports = {
   registrarVentaAPI, 
   traerVentas, 
@@ -249,5 +287,6 @@ module.exports = {
   eliminarVentaPorId, 
   crearVenta, 
   agregarProductoVenta, 
-  modificarVentaPorId
+  modificarVentaPorId,
+  exportarExcelVentas, 
 };
