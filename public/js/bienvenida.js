@@ -1,14 +1,23 @@
-const form = document.getElementById("form-bienvenida");
-const inputNombre = document.getElementById("nombre");
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('form-bienvenida');
 
-inputNombre.value = Cliente.nombre() ?? "";
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-form.addEventListener("submit", (ev) => {
-  ev.preventDefault();
-  inputNombre.value = inputNombre.value.trim();
-  form.classList.add("was-validated");
-  if (!form.checkValidity()) return;
+      const input = document.getElementById('input-nombre');
+      const nombre = input ? input.value.trim() : '';
 
-  Cliente.guardar(inputNombre.value);
-  irA("productos/index.html");
+      if (nombre.length >= 1) {
+        // Guardar nombre en sessionStorage
+        setNombreCliente(nombre);
+
+        // Redirigir a productos.html
+        window.location.href = 'productos/productos.html';
+      } else {
+        alert('Por favor, ingresá tu nombre para continuar.');
+      }
+    });
+  }
 });
