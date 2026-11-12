@@ -46,3 +46,10 @@ body.dark-mode nav button,
 body.dark-mode li {
   color: #ffffff !important;
 }
+body.dark-mode header,
+body.dark-mode nav,
+body.dark-mode .navbar,
+body.dark-mode .bg-light {
+  background-color: #1a1a1a !important;
+  border-bottom: 1px solid #333333 !important;
+}
