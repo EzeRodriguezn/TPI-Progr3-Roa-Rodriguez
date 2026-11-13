@@ -82,7 +82,7 @@ function tarjeta(p) {
         <div class="card-body d-flex flex-column">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="badge text-bg-secondary">${esc(p.subcategoria ?? "")}</span>
-            <small class="text-body-secondary">Stock: ${stock}</small>
+            <small class="text-body-secondary stock-producto">Stock: ${stock}</small>
           </div>
           <h5 class="card-title">${esc(p.nombre)}</h5>
           <p class="precio fs-4 mt-auto mb-3">${formatearPrecio(p.precio)}</p>

@@ -1,88 +1,6 @@
-main {
-  flex: 1;
-}
-
-.product-card-img {
-  height: 180px;
-  object-fit: contain;
-  padding: 1rem;
-}
-
-/* MODO OSCURO */
-body.dark-mode {
-  background-color: #121212;
-  color: #ffffff;
-}
-
-body.dark-mode h1, 
-body.dark-mode h2, 
-body.dark-mode h3, 
-body.dark-mode p, 
-body.dark-mode span,
-body.dark-mode label {
-  color: #f1f1f1 !important;
-}
-body.dark-mode input {
-  background-color: #222222 !important;
-  color: #ffffff !important;
-  border: 1px solid #555555 !important;
-}
-
-/* Aclarar el color del texto de relleno ("Tu nombre...") */
-body.dark-mode input::placeholder {
-  color: #bbbbbb !important;
-}
-
-body.dark-mode .modal-content,
-body.dark-mode .card,
-body.dark-mode .contenedor {
-  background-color: #1e1e1e;
-  border: 1px solid #333333;
-}
-body.dark-mode a,
-body.dark-mode nav a,
-body.dark-mode header a,
-body.dark-mode .nav-link,
-body.dark-mode nav button,
-body.dark-mode li {
-  color: #ffffff !important;
-}
-body.dark-mode header,
-body.dark-mode nav,
-body.dark-mode .navbar,
-body.dark-mode .bg-light {
-  background-color: #1a1a1a !important;
-  border-bottom: 1px solid #333333 !important;
-}
-
-/* --- ESTILOS DE LA PAGINACIÓN --- */
-body.dark-mode .page-link {
-  background-color: #222222 !important; 
-  color: #ffffff !important; 
-  border-color: #444444 !important; 
-}
-
-body.dark-mode .page-link:hover {
-  background-color: #333333 !important;
-  color: #f1f1f1 !important;
-}
-
-body.dark-mode .page-item.active .page-link {
-  background-color: #0d6efd !important; 
-  border-color: #0d6efd !important;
-  color: #ffffff !important;
-}
-
-body.dark-mode .page-item.disabled .page-link {
-  background-color: #1a1a1a !important;
-  color: #666666 !important;
-  border-color: #333333 !important;
-}
-
 :root {
   --bg-principal: #f8f9fa;
   --bg-card: #ffffff;
-  --bg-card-glass: rgba(255, 255, 255, 0.88);
   --text-principal: #212529;
   --text-muted: #6c757d;
   --border-color: #dee2e6;
@@ -94,7 +12,6 @@ body.dark-mode .page-item.disabled .page-link {
 [data-bs-theme="dark"] {
   --bg-principal: #121212;
   --bg-card: #1e1e1e;
-  --bg-card-glass: rgba(24, 28, 36, 0.85);
   --text-principal: #e0e0e0;
   --text-muted: #a0a0a0;
   --border-color: #333333;
@@ -109,11 +26,297 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding-bottom: 28px;
 }
 
-.card, .modal-content, .table {
+main {
+  flex: 1;
+}
+
+.card, .modal-content, .table, .list-group-item {
   background-color: var(--bg-card) !important;
   color: var(--text-principal) !important;
   border-color: var(--border-color) !important;
 }
 
+/* --- MODO OSCURO GENERAL --- */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label {
+  color: #f1f1f1 !important;
+}
+
+body.dark-mode .stock-producto {
+  color: #ffffff !important;
+}
+
+body.dark-mode input {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+  border: 1px solid #555555 !important;
+}
+
+body.dark-mode input::placeholder {
+  color: #bbbbbb !important;
+}
+
+body.dark-mode a,
+body.dark-mode nav a,
+body.dark-mode header a,
+body.dark-mode .nav-link,
+body.dark-mode nav button,
+body.dark-mode li {
+  color: #ffffff !important;
+}
+
+body.dark-mode header:not(.xp-header-wrapper),
+body.dark-mode nav:not(.xp-navbar),
+body.dark-mode .navbar:not(.xp-navbar),
+body.dark-mode .bg-light {
+  background-color: #1a1a1a !important;
+  border-bottom: 1px solid #333333 !important;
+}
+
+body.dark-mode .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* --- PAGINACIÓN EN MODO OSCURO --- */
+body.dark-mode .page-link {
+  background-color: #222222 !important;
+  color: #ffffff !important;
+  border-color: #444444 !important;
+}
+
+body.dark-mode .page-link:hover {
+  background-color: #333333 !important;
+  color: #f1f1f1 !important;
+}
+
+body.dark-mode .page-item.active .page-link {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #ffffff !important;
+}
+
+body.dark-mode .page-item.disabled .page-link {
+  background-color: #1a1a1a !important;
+  color: #666666 !important;
+  border-color: #333333 !important;
+}
+
+/* =========================================================
+   HEADER ESTILO WINDOWS XP - TEMA CLARO Y OSCURO
+   ========================================================= */
+.xp-header-wrapper {
+  z-index: 1030;
+  border-top: 4px solid #f7f6f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+}
+
+.xp-navbar {
+  background: linear-gradient(180deg, #f7f6f0 0%, #ece9d8 58%, #adaaaa 100%) !important;
+  border-bottom: 2px solid #adaaaa !important;
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+.xp-brand {
+  color: #000000 !important;
+  font-size: 1.25rem;
+  letter-spacing: -0.2px;
+  text-decoration: none;
+}
+
+.xp-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0.38rem 0.95rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1a1a1a !important;
+  text-decoration: none;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f3ea 45%, #e8e4d3 90%, #dcd7c3 100%);
+  border: 1px solid #7f7c73;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 0 #ffffff, inset 0 -1px 0 rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  cursor: pointer;
+}
+
+.xp-nav-btn:hover {
+  color: #000000 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #faf6e8 50%, #efe8ce 100%);
+  border-color: #9b9b98;
+  box-shadow: inset 0 0 0 1px #6e6e6d, 0 1px 3px rgba(0, 0, 0, 0.16);
+}
+
+.xp-nav-btn.active {
+  color: #000000 !important;
+  font-weight: 600;
+  background: linear-gradient(180deg, #e2decb 0%, #ece9d8 45%, #f7f5ec 100%);
+  border-color: #003c74;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.18), inset 0 0 0 1px rgba(61, 149, 255, 0.45);
+}
+
+.xp-toggler {
+  border-color: #7f7c73 !important;
+  background-color: #f5f3ea !important;
+}
+
+body.dark-mode .xp-header-wrapper,
+[data-theme="dark"] .xp-header-wrapper {
+  border-top-color: #1b2b4b;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.55);
+}
+
+body.dark-mode .xp-navbar,
+[data-theme="dark"] .xp-navbar {
+  background: linear-gradient(180deg, #1b2b4b 0%, #142038 55%, #0e1729 100%) !important;
+  border-bottom: 2px solid #2c4370 !important;
+  box-shadow: inset 0 1px 0 rgba(148, 184, 232, 0.18);
+}
+
+body.dark-mode .xp-brand,
+[data-theme="dark"] .xp-brand {
+  color: #f0f5ff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.75);
+}
+
+body.dark-mode .xp-nav-btn,
+[data-theme="dark"] .xp-nav-btn {
+  color: #eef4ff !important;
+  background: linear-gradient(180deg, #112e68 0%, #1d2e4f 50%, #15223b 100%);
+  border: 1px solid #3c598f;
+  box-shadow: inset 0 1px 0 rgba(180, 210, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.45), 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .xp-nav-btn:hover,
+[data-theme="dark"] .xp-nav-btn:hover {
+  color: #ffffff !important;
+  background: linear-gradient(180deg, #324d82 0%, #253b66 50%, #1b2c4d 100%);
+  border-color: #6699e6;
+  box-shadow: inset 0 0 0 1px rgba(130, 180, 255, 0.45), 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .xp-nav-btn.active,
+[data-theme="dark"] .xp-nav-btn.active {
+  color: #ffffff !important;
+  font-weight: 600;
+  background: linear-gradient(180deg, #111b30 0%, #182745 50%, #20345c 100%);
+  border-color: #4d88e5;
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.65), inset 0 0 0 1px rgba(77, 136, 229, 0.45);
+}
+
+body.dark-mode .xp-toggler,
+[data-theme="dark"] .xp-toggler {
+  border-color: #3c598f !important;
+  background-color: #1d2e4f !important;
+}
+
+body.dark-mode .xp-toggler .navbar-toggler-icon,
+[data-theme="dark"] .xp-toggler .navbar-toggler-icon {
+  filter: invert(1) brightness(180%);
+}
+
+/* =========================================================
+   BARRA DE TAREAS INFERIOR WINDOWS XP (TODAS LAS PANTALLAS)
+   ========================================================= */
+.xp-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 26px;
+  background: linear-gradient(180deg, #3168d5 0%, #4993e6 9%, #235cdc 18%, #2258d7 92%, #1941a5 100%);
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.35);
+  user-select: none;
+  z-index: 1030;
+  overflow: hidden;
+}
+
+.xp-start-btn {
+  height: 100%;
+  background: linear-gradient(180deg, #52b848 0%, #3d9e35 15%, #2f8b28 85%, #246e1e 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1rem;
+  letter-spacing: 0.3px;
+  padding: 0 18px 0 12px;
+  border-radius: 0 14px 14px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.55), 2px 0 4px rgba(0, 0, 0, 0.35);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.65);
+  cursor: default;
+}
+
+.xp-win-logo {
+  width: 18px !important;
+  height: 22px !important;
+  filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.4));
+}
+
+.xp-window-tab {
+  height: 20px;
+  margin-left: 12px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, #1b49b3 0%, #1e52c6 20%, #1945a8 90%, #143687 100%);
+  border: 1px solid #102d73;
+  border-radius: 3px;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.45), 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-size: 0.84rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 195px;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.xp-tray {
+  margin-left: auto;
+  color: #ffffff;
+  font-size: 0.80rem;
+  font-weight: 500;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.45);
+  gap: 12px;
+}
+
+.xp-tray-sep {
+  opacity: 0.6;
+}
+
+body.dark-mode .xp-taskbar,
+[data-theme="dark"] .xp-taskbar {
+  background: linear-gradient(180deg, #1b2a4a 0%, #243963 10%, #142038 90%, #0d1526 100%);
+}
+
+body.dark-mode .xp-start-btn,
+[data-theme="dark"] .xp-start-btn {
+  background: linear-gradient(180deg, #2d6e32 0%, #215425 20%, #18401b 90%, #112e13 100%);
+}
+
+body.dark-mode .xp-window-tab,
+[data-theme="dark"] .xp-window-tab {
+  background: linear-gradient(180deg, #111b30 0%, #16233d 20%, #0f192b 90%, #0a101c 100%);
+  border-color: #080d17;
+}
+
+@media (max-width: 576px) {
+  .xp-tray {
+    display: none;
+  }
+}
