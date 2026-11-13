@@ -1,9 +1,14 @@
-<nav style="background-color: #333; padding: 15px; display: flex; gap: 20px;">
+<nav style="background-color: #333; padding: 15px; display: flex; gap: 20px; align-items: center;">
     <a href="/productos" style="color: white; text-decoration: none;">Ver Productos</a>
     <% if (adminLogueado) { %>
         <a href="/dashboard" style="color: white; text-decoration: none; font-weight: bold;">Dashboard</a>
         <a href="/productos/nuevo" style="color: white; text-decoration: none;">Alta Producto</a>
-        <a href="/usuarios/logout" style="color: white; text-decoration: none; margin-left: auto;">Salir</a>
+        
+        <!-- Contenedor para alinear a la derecha los botones del extremo -->
+        <div style="display: flex; gap: 15px; margin-left: auto; align-items: center;">
+            <a href="http://127.0.0.1:5500/public/index.html" style="color: white; text-decoration: none; background-color: #333; padding: 5px 10px; border-radius: 4px;">Ir al inicio</a>
+            <a href="/usuarios/logout" style="color: white; text-decoration: none;">Salir</a>
+        </div>
     <% } else { %>
         <a href="/login" style="color: white; text-decoration: none; margin-left: auto;">Ingresar</a>
     <% } %>

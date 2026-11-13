@@ -13,9 +13,35 @@
         .btn { padding: 8px 12px; text-decoration: none; color: white; border-radius: 4px; border: none; cursor: pointer; }
         .btn-nuevo { background-color: #28a745; display: inline-block; margin-bottom: 15px; }
         .btn-editar { background-color: #007bff; }
-        .btn-baja { background-color: #dc3545; }
+        .btn-baja { background-color: #ffc107; color: #000; }
         .btn-alta { background-color: #28a745; }
+        .btn-eliminar { background-color: #dc3545; }
         img.miniatura { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; }
+
+        /* Estilos del Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+        }
+        .modal-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
     </style>
 </head>
 <body>
@@ -65,20 +91,23 @@
                                 <% } %>
                             </td>
                             <% } %>
+                            
+                            <% if (adminLogueado) { %>
                             <td>
-                                <a href="/productos/editar/<%= producto.id %>" class="btn btn-editar">Editar</a>
-                                
-                                <!-- Botones de baja y reactivación según el estado -->
-                                <% if (producto.activo !== false) { %>
-                                    <form action="/productos/desactivar/<%= producto.id %>" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-baja">Desactivar</button>
-                                    </form>
-                                <% } else { %>
-                                    <form action="/productos/reactivar/<%= producto.id %>" method="POST" style="display:inline;">
-                                        <button type="submit" class="btn btn-alta">Activar</button>
-                                    </form>
-                                <% } %>
+                                <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+                                    <a href="/productos/editar/<%= producto.id %>" class="btn btn-editar">Editar</a>
+                                    
+                                    <!-- Botones de baja, alta y eliminar con modal de confirmación -->
+                                    <% if (producto.activo !== false) { %>
+                                        <button type="button" class="btn btn-baja" onclick="abrirModal('desactivar', '<%= producto.id %>', '<%= producto.nombre %>')">Desactivar</button>
+                                    <% } else { %>
+                                        <button type="button" class="btn btn-alta" onclick="abrirModal('reactivar', '<%= producto.id %>', '<%= producto.nombre %>')">Activar</button>
+                                    <% } %>
+
+                                    <button type="button" class="btn btn-eliminar" onclick="abrirModal('eliminar', '<%= producto.id %>', '<%= producto.nombre %>')">Eliminar</button>
+                                </div>
                             </td>
+                            <% } %>
                         </tr>
                     <% }) %>
                 <% } else { %>
@@ -89,6 +118,58 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Modal de Confirmación Único y Dinámico -->
+    <div id="modalConfirmacion" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="tituloModal">¿Estás seguro?</h3>
+            <p id="textoProducto" style="color: #555; margin: 10px 0 20px 0;"></p>
+            <form id="formAccion" method="POST">
+                <div class="modal-actions">
+                    <button type="button" class="btn" style="background-color: #6c757d;" onclick="cerrarModal()">Cancelar</button>
+                    <button type="submit" id="btnConfirmar" class="btn">Confirmar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function abrirModal(accion, id, nombre) {
+            const modal = document.getElementById("modalConfirmacion");
+            const form = document.getElementById("formAccion");
+            const titulo = document.getElementById("tituloModal");
+            const texto = document.getElementById("textoProducto");
+            const btnConfirmar = document.getElementById("btnConfirmar");
+
+            texto.textContent = `Producto: "${nombre}"`;
+
+            if (accion === 'desactivar') {
+                titulo.textContent = "¿Estás seguro de desactivarlo?";
+                form.action = `/productos/desactivar/${id}`;
+                btnConfirmar.className = "btn btn-baja";
+                btnConfirmar.style.color = "#000";
+                btnConfirmar.textContent = "Sí, desactivar";
+            } else if (accion === 'reactivar') {
+                titulo.textContent = "¿Estás seguro de activarlo?";
+                form.action = `/productos/reactivar/${id}`;
+                btnConfirmar.className = "btn btn-alta";
+                btnConfirmar.style.color = "#fff";
+                btnConfirmar.textContent = "Sí, activar";
+            } else if (accion === 'eliminar') {
+                titulo.textContent = "¿Estás seguro de eliminarlo?";
+                form.action = `/productos/eliminar/${id}`;
+                btnConfirmar.className = "btn btn-eliminar";
+                btnConfirmar.style.color = "#fff";
+                btnConfirmar.textContent = "Sí, eliminar";
+            }
+
+            modal.style.display = "flex";
+        }
+
+        function cerrarModal() {
+            document.getElementById("modalConfirmacion").style.display = "none";
+        }
+    </script>
 
 </body>
 </html>

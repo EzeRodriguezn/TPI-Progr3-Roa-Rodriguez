@@ -43,8 +43,8 @@
                 <label for="categoria">Categoría:</label>
                 <select id="categoria" name="categoria" required>
                     <option value="">Seleccioná una categoría</option>
-                    <option value="perifericos" <%= typeof producto !== 'undefined' && producto.categoria === 'perifericos' ? 'selected' : '' %>>Periféricos</option>
-                    <option value="sillas" <%= typeof producto !== 'undefined' && producto.categoria === 'sillas' ? 'selected' : '' %>>Sillas</option>
+                    <option value="Perifericos" <%= typeof producto !== 'undefined' && producto.categoria === 'Perifericos' ? 'selected' : '' %>>Periféricos</option>
+                    <option value="Sillas" <%= typeof producto !== 'undefined' && producto.categoria === 'Sillas' ? 'selected' : '' %>>Sillas</option>
                 </select>
             </div>
 
@@ -72,8 +72,8 @@
             const subcategoriaSelect = document.getElementById('subcategoria');
 
             const opcionesSubcategoria = {
-                'perifericos': ['Teclado', 'Mouse', 'Auriculares'],
-                'sillas': ['Ergonómica', 'Oficina', 'Gamer']
+                'Perifericos': ['Teclado', 'Mouse', 'Auriculares'],
+                'Sillas': ['Ergonómica', 'Oficina', 'Gamer']
             };
 
             const subcategoriaActual = "<%= typeof producto !== 'undefined' ? producto.subcategoria : '' %>";
