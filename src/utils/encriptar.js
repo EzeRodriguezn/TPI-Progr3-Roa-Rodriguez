@@ -1,22 +1,25 @@
-//node src/utils/encriptar.js
-
-const CLAVE_SECRETA = "12345678901234567890123456789012";
-
+require("dotenv").config();
 const crypto = require("crypto");
-const contraseñaDelUsuario = "abc12334AD";
+const claveHex = process.env.CIFRADO_KEY;
+const texto = process.argv[2];
 
-function encriptar(contraseña) {
-    console.time();
-    const iv = crypto.randomBytes(12);
-
-    const encriptador = crypto.createCipheriv("aes-256-gcm", CLAVE_SECRETA, iv);
-
-    const resultado = encriptador.update(contraseña, "utf-8", "base64");
-    console.log(iv.toString("base64"), resultado);
-
-    console.timeEnd();
-    
-// PassOriginal + IV + PassServidor + Algoritmo ==> ENCRIPTADO
-
+if (!/^[\da-f]{64}$/i.test(claveHex || "")) {
+  throw new Error("CIFRADO_KEY debe contener 64 caracteres hexadecimales");
 }
-encriptar(contraseñaDelUsuario);
+
+if (!texto) {
+  throw new Error("Uso: node src/utils/encriptar.js <texto>");
+}
+
+const iv = crypto.randomBytes(12);
+const encriptador = crypto.createCipheriv("aes-256-gcm", Buffer.from(claveHex, "hex"), iv);
+const cifrado = Buffer.concat([
+  encriptador.update(texto, "utf8"),
+  encriptador.final(),
+]);
+
+console.log(JSON.stringify({
+  iv: iv.toString("base64"),
+  cifrado: cifrado.toString("base64"),
+  etiqueta: encriptador.getAuthTag().toString("base64"),
+}));

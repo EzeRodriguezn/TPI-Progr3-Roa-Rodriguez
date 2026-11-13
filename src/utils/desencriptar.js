@@ -1,34 +1,32 @@
 
-const IVguardado = "42F/6tyW17c=";
-const encriptadoguardado = "HhoMxQIGA6Ci";
+require("dotenv").config();
+const crypto = require("crypto");
+const claveHex = process.env.CIFRADO_KEY;
+const [ivBase64, cifradoBase64, etiquetaBase64] = process.argv.slice(2);
 
-function desencriptar(contraseña, IVGuardado, encriptado) {
-  const iv = Buffer.from(IVGuardado, "base64");
-
-  console.log(iv);
-
-  const desencriptador = crypto.createDecipheriv(
-    "aes-256-gcm",
-    CLAVE_SECRETA,
-    iv,
-  );
-
-  const resultado = desencriptador.update(encriptado, "base64", "utf-8");
-
-  console.log("Resultado: ", resultado);
-
-  console.log("Coinciden?: ", resultado === contraseña);
+if (!/^[\da-f]{64}$/i.test(claveHex || "")) {
+  throw new Error("CIFRADO_KEY debe contener 64 caracteres hexadecimales");
 }
 
-function encriptar(contraseña) {
-  const iv = Buffer.from(IVguardado, "base64");
-
-  const encriptador = crypto.createCipheriv("aes-256-gcm", CLAVE_SECRETA, iv);
-
-  const resultado = encriptador.update(contraseña, "utf-8", "base64");
-
-  console.log(resultado === encriptadoguardado);
+if (!ivBase64 || !cifradoBase64 || !etiquetaBase64) {
+  throw new Error("Uso: node src/utils/desencriptar.js <iv> <cifrado> <etiqueta>");
 }
 
-desencriptar(contraseñaDelUsuario, IVguardado, encriptadoguardado);
-encriptar(contraseñaDelUsuario);
+const iv = Buffer.from(ivBase64, "base64");
+const etiqueta = Buffer.from(etiquetaBase64, "base64");
+if (iv.length !== 12 || etiqueta.length !== 16) {
+  throw new Error("El IV o la etiqueta de autenticación no tienen un formato válido");
+}
+
+const desencriptador = crypto.createDecipheriv(
+  "aes-256-gcm",
+  Buffer.from(claveHex, "hex"),
+  iv,
+);
+desencriptador.setAuthTag(etiqueta);
+const resultado = Buffer.concat([
+  desencriptador.update(Buffer.from(cifradoBase64, "base64")),
+  desencriptador.final(),
+]);
+
+process.stdout.write(`${resultado.toString("utf8")}\n`);
