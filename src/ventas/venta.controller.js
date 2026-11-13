@@ -1,4 +1,4 @@
-const ExcelJS = require("exceljs"); 
+const ExcelJS = require("exceljs");
 const sequelize = require("../database/sequelize");
 const { Usuario, Venta, Producto, ProductoVentas } = require("../database/relaciones");
 
@@ -50,7 +50,10 @@ const registrarVentaAPI = async (req, res) => {
       }
 
       let totalCentavos = 0;
-      const detalles = productos.map((producto) => {
+      const detalles = [];
+
+      // Recorremos los productos para calcular totales, validar y descontar el stock
+      for (const producto of productos) {
         const precio = String(producto.precio);
         if (!/^\d+(?:\.\d{1,2})?$/.test(precio)) {
           throw new Error(`Precio inválido para el producto ${producto.id}`);
@@ -59,16 +62,25 @@ const registrarVentaAPI = async (req, res) => {
         const [entero, decimales = ""] = precio.split(".");
         const precioCentavos = Number(entero) * 100 + Number(decimales.padEnd(2, "0"));
         const cantidad = cantidades.get(producto.id);
-        totalCentavos += precioCentavos * cantidad;
-        if (!Number.isSafeInteger(totalCentavos) || totalCentavos > 9_999_999_999) {
-          return null;
+
+        // 1. Validar que haya stock suficiente antes de procesar la venta
+        if (producto.stock < cantidad) {
+          return { 
+            status: 400, 
+            error: `Stock insuficiente para el producto: ${producto.nombre}. Stock actual: ${producto.stock}, Solicitado: ${cantidad}` 
+          };
         }
 
-        return { producto, cantidad, precio: (precioCentavos / 100).toFixed(2) };
-      });
+        totalCentavos += precioCentavos * cantidad;
+        if (!Number.isSafeInteger(totalCentavos) || totalCentavos > 9_999_999_999) {
+          return { status: 400, error: "El total de la venta excede el máximo permitido" };
+        }
 
-      if (detalles.includes(null)) {
-        return { status: 400, error: "El total de la venta excede el máximo permitido" };
+        // 2. Descontar el stock en la base de datos
+        const nuevoStock = producto.stock - cantidad;
+        await producto.update({ stock: nuevoStock }, { transaction });
+
+        detalles.push({ producto, cantidad, precio: (precioCentavos / 100).toFixed(2) });
       }
 
       const nuevaVenta = await Venta.create({
@@ -94,7 +106,7 @@ const registrarVentaAPI = async (req, res) => {
     }
 
     res.status(201).json({
-      mensaje: "Venta registrada con éxito",
+      mensaje: "Venta registrada con éxito y stock actualizado",
       idVenta: resultado.idVenta,
     });
   } catch (error) {
@@ -243,7 +255,6 @@ const modificarVentaPorId = async (req, res, next) => {
   }
 };
 
-// <-- ACÁ ESTÁ LA FUNCIÓN QUE FALTABA -->
 const exportarExcelVentas = async (req, res, next) => {
   try {
     const ventas = await Venta.findAll({ order: [["createdAt", "DESC"]] });
@@ -288,5 +299,5 @@ module.exports = {
   crearVenta, 
   agregarProductoVenta, 
   modificarVentaPorId,
-  exportarExcelVentas, 
+  exportarExcelVentas
 };

@@ -9,7 +9,8 @@
         .container { padding: 20px; max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"], input[type="number"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        /* Se agregó "select" a esta regla para mantener el mismo diseño en las listas desplegables */
+        input[type="text"], input[type="number"], input[type="file"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; font-weight: bold; }
         button:hover { background-color: #218838; }
     </style>
@@ -21,7 +22,6 @@
     <div class="container">
         <h2><%= typeof producto !== 'undefined' ? 'Editar Producto #' + producto.id : 'Cargar Nuevo Producto' %></h2>
         
-        <!-- Si existe "producto", el form envía los datos a editar. Si no, los envía a crear -->
         <form action="<%= typeof producto !== 'undefined' ? '/productos/editar/' + producto.id : '/productos/nuevo' %>" method="POST" enctype="multipart/form-data">
             
             <div class="form-group">
@@ -43,19 +43,21 @@
                 <label for="categoria">Categoría:</label>
                 <select id="categoria" name="categoria" required>
                     <option value="">Seleccioná una categoría</option>
-                    <option value="perifericos" <%= typeof producto !== 'undefined' && producto.categoria === 'perifericos' ? 'selected' : '' %>>Periféricos</option>
-                    <option value="sillas" <%= typeof producto !== 'undefined' && producto.categoria === 'sillas' ? 'selected' : '' %>>Sillas</option>
+                    <option value="Perifericos" <%= typeof producto !== 'undefined' && producto.categoria === 'Perifericos' ? 'selected' : '' %>>Periféricos</option>
+                    <option value="Sillas" <%= typeof producto !== 'undefined' && producto.categoria === 'Sillas' ? 'selected' : '' %>>Sillas</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="subcategoria">Subcategoría:</label>
-                <input type="text" id="subcategoria" name="subcategoria" value="<%= typeof producto !== 'undefined' ? producto.subcategoria : '' %>">
+                <!-- Select vacío. JavaScript se encargará de llenarlo -->
+                <select id="subcategoria" name="subcategoria" required>
+                    <option value="">Seleccioná una subcategoría</option>
+                </select>
             </div>
 
             <div class="form-group">
                 <label for="imagen">Imagen del Producto:</label>
-                <!-- Al editar, la imagen nueva es opcional. Al crear, es obligatoria -->
                 <input type="file" id="imagen" name="imagen" accept="image/*" <%= typeof producto !== 'undefined' ? '' : 'required' %>>
             </div>
 
@@ -63,5 +65,42 @@
         </form>
     </div>
 
+    <!-- Script para la lógica dinámica de categorías -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const categoriaSelect = document.getElementById('categoria');
+            const subcategoriaSelect = document.getElementById('subcategoria');
+
+            const opcionesSubcategoria = {
+                'Perifericos': ['Teclado', 'Mouse', 'Auriculares'],
+                'Sillas': ['Ergonómica', 'Oficina', 'Gamer']
+            };
+
+            const subcategoriaActual = "<%= typeof producto !== 'undefined' ? producto.subcategoria : '' %>";
+
+            function actualizarSubcategorias() {
+                const categoriaSeleccionada = categoriaSelect.value;
+                
+                subcategoriaSelect.innerHTML = '<option value="">Seleccioná una subcategoría</option>';
+
+                if (opcionesSubcategoria[categoriaSeleccionada]) {
+                    opcionesSubcategoria[categoriaSeleccionada].forEach(sub => {
+                        const option = document.createElement('option');
+                        option.value = sub;
+                        option.textContent = sub;
+                        
+                        if (sub === subcategoriaActual) {
+                            option.selected = true;
+                        }
+                        
+                        subcategoriaSelect.appendChild(option);
+                    });
+                }
+            }
+
+            categoriaSelect.addEventListener('change', actualizarSubcategorias);
+            actualizarSubcategorias();
+        });
+    </script>
 </body>
 </html>
