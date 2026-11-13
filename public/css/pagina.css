@@ -41,7 +41,7 @@ body.pantalla-bienvenida {
   background-repeat: no-repeat;
   background-attachment: fixed;
   transition: background-image 0.4s ease-in-out;
-  /* Fondo exclusivo para Productos, Carrito y Ticket */
+}
 body[data-pagina="productos"],
 body[data-pagina="carrito"],
 body[data-pagina="ticket"] {
@@ -52,7 +52,7 @@ body[data-pagina="ticket"] {
   background-attachment: fixed;
   transition: background-image 0.4s ease-in-out;
 }
-}
+
 
 /* --- VENTANA DE BIENVENIDA ESTILO WINDOWS XP --- */
 body.pantalla-bienvenida .card-bienvenida {
