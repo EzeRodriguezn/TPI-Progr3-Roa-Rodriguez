@@ -88,6 +88,7 @@ body.dark-mode .page-item.disabled .page-link {
   --border-color: #dee2e6;
   --primary-color: #0d6efd;
   --bg-bienvenida: url('../img/windows xp tema claro.jpg');
+  --bg-interior: url('../img/tema claro dia.jpeg');
 }
 
 [data-theme="dark"],
@@ -100,6 +101,7 @@ body.dark-mode .page-item.disabled .page-link {
   --border-color: #333333;
   --primary-color: #3d8bfd;
   --bg-bienvenida: url('../img/windows xp tema oscuro.jpeg');
+  --bg-interior: url('../img/tema oscuro noche.jpeg');
 }
 
 body {
