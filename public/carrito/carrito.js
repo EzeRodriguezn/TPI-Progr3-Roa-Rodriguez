@@ -57,13 +57,15 @@ function filaItem(item) {
 
           <strong class="text-end" style="min-width: 6.5rem;">${formatearPrecio(subtotal)}</strong>
 
-          <button type="button" class="btn btn-outline-danger btn-sm" data-accion="eliminar" data-id="${item.id}" aria-label="Eliminar ${esc(item.nombre)} del carrito">
+          <!-- El tacho ahora actúa restando de a 1 unidad -->
+          <button type="button" class="btn btn-outline-danger btn-sm" data-accion="eliminar" data-id="${item.id}" aria-label="Quitar uno de ${esc(item.nombre)}">
             <i class="bi bi-trash"></i>
           </button>
         </div>
       </div>
     </li>`;
 }
+
 lista.addEventListener("click", (ev) => {
   const boton = ev.target.closest("[data-accion]");
   if (!boton) return;
@@ -77,10 +79,8 @@ lista.addEventListener("click", (ev) => {
       if (item.cantidad < (Number(item.stock) || 0)) actualizarCantidadCarrito(id, 1);
       break;
     case "menos":
+    case "eliminar": // <-- Tanto el botón menos como el tacho ejecutan la resta de a 1 unidad
       actualizarCantidadCarrito(id, -1); 
-      break;
-    case "eliminar":
-      eliminarDelCarrito(id);
       break;
   }
   render();
@@ -114,7 +114,7 @@ async function confirmarCompra() {
     const total = calcularTotalCarrito();
     const nombreCliente = getNombreCliente();
 
-const venta = {
+    const venta = {
       nombreCliente,
       fecha,
       total,
@@ -143,6 +143,7 @@ const venta = {
     setCargando(false);
   }
 }
+
 function setCargando(cargando) {
   document.getElementById("spinner-confirmar").classList.toggle("d-none", !cargando);
   document.getElementById("texto-confirmar").textContent = cargando ? "Procesando..." : "Confirmar compra";

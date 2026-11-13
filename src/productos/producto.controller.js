@@ -1,13 +1,10 @@
 const { Producto } = require("../database/relaciones");
-const categoriasPermitidas = new Set(["perifericos", "sillas"]);
+const categoriasPermitidas = new Set(["Perifericos", "Sillas"]);
 
 // 1. Mostrar la tabla con todos los productos (Renderiza EJS)
 const traerProductos = async (req, res) => {
   try {
-    // Ordenamos alfabéticamente por nombre del producto
     const productos = await Producto.findAll({ order: [["nombre", "ASC"]] });
-    
-    // Conecta con src/view/productos/listado.ejs pasándole los datos
     res.render("productos/listado", { productos });
   } catch (error) {
     console.error(error);
@@ -45,7 +42,6 @@ const crearProducto = async (req, res) => {
       return res.status(400).send("La categoría debe ser periféricos o sillas");
     }
 
-    // Atrapamos la imagen procesada por Multer, o ponemos una por defecto
     const imagen = req.file ? req.file.filename : 'default.png';
 
     await Producto.create({
@@ -58,7 +54,6 @@ const crearProducto = async (req, res) => {
       activo: true 
     });
 
-    // Redirigimos al listado después de crear
     res.redirect("/productos");
   } catch (error) {
     console.error(error);
@@ -66,10 +61,8 @@ const crearProducto = async (req, res) => {
   }
 };
 
-
 const modificarProductoPorId = async (req, res) => {
   try {
-    // Agregamos categoria y subcategoria que faltaban desestructurar del req.body
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
     const { id } = req.params;
 
@@ -85,7 +78,6 @@ const modificarProductoPorId = async (req, res) => {
     if (categoria !== undefined) datosAModificar.categoria = categoria;
     if (subcategoria !== undefined) datosAModificar.subcategoria = subcategoria;
 
-    // Si el usuario subió una imagen nueva, la pisamos
     if (req.file) {
       datosAModificar.imagen = req.file.filename;
     }
@@ -104,7 +96,6 @@ const modificarProductoPorId = async (req, res) => {
   }
 };
 
-
 const desactivarProducto = async (req, res) => {
   try {
     await Producto.update({ activo: false }, { where: { id: req.params.id } });
@@ -115,7 +106,6 @@ const desactivarProducto = async (req, res) => {
   }
 };
 
-
 const reactivarProducto = async (req, res) => {
   try {
     await Producto.update({ activo: true }, { where: { id: req.params.id } });
@@ -125,23 +115,38 @@ const reactivarProducto = async (req, res) => {
     res.status(500).send("Error al reactivar el producto");
   }
 };
-// Función exclusiva para el frontend (Autoservicio)
+
+const eliminarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const producto = await Producto.findByPk(id);
+    
+    if (!producto) {
+      return res.status(404).send("Producto no encontrado");
+    }
+
+    await producto.destroy();
+    res.redirect("/productos");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al eliminar el producto (puede estar asociado a ventas)");
+  }
+};
+
 const traerProductosAPI = async (req, res) => {
   try {
-    // Buscamos solo los productos que estén activos
     const productos = await Producto.findAll({
       where: {
-        activo: true // Ajustá este nombre si en tu base de datos la columna se llama distinto (ej: estado, disponible)
+        activo: true 
       }
     });
-
-    // En vez de un res.render, devolvemos un JSON
     res.json(productos);
   } catch (error) {
     console.error("Error al obtener productos para la API:", error);
     res.status(500).json({ error: "Ocurrió un error en el servidor" });
   }
 };
+
 module.exports = {
   traerProductos,
   mostrarFormularioNuevo,
@@ -150,5 +155,6 @@ module.exports = {
   modificarProductoPorId,
   desactivarProducto,
   reactivarProducto,
+  eliminarProducto, 
   traerProductosAPI,
 };
