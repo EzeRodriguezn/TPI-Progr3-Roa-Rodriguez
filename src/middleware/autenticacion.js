@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const nombreCookie = "adminLogueado";
 const duracionCookie = 60 * 60 * 24; // 24 horas
 
+// La clave debe ser secreta para que el navegador no pueda inventar una firma.
 const obtenerSecreto = () => {
   const secreto = process.env.COOKIE_SECRET;
   if (!secreto || secreto.length < 32) {
@@ -19,10 +20,12 @@ const firmaValida = (valor, firmaRecibida) => {
 
   const firmaEsperada = Buffer.from(generarFirma(valor));
   const firma = Buffer.from(firmaRecibida);
+  // Se comparan firmas del mismo largo y en tiempo constante.
   return firma.length === firmaEsperada.length &&
     crypto.timingSafeEqual(firma, firmaEsperada);
 };
 
+// Lee la cookie y acepta el inicio de sesión solo si su firma es correcta.
 const leerCookieAdmin = (req) => {
   const cookies = req.headers.cookie || "";
   const cookie = cookies.split(";").map((parte) => parte.trim())
@@ -56,6 +59,7 @@ const establecerCookieAdmin = (res) => {
     "SameSite=Lax",
   ];
 
+  // En producción la cookie solo se envía por HTTPS.
   if (process.env.NODE_ENV === "production") opciones.push("Secure");
   res.setHeader("Set-Cookie", opciones.join("; "));
 };

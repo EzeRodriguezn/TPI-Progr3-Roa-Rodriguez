@@ -5,12 +5,21 @@ if (!getNombreCliente()) {
 } else if (!datosTicket) {
   window.location.href = "../productos/productos.html";
 } else {
-  render();
+  mostrarTicket();
 }
 
-function render() {
+function mostrarTicket() {
   const fecha = new Date(datosTicket.fecha).toLocaleString("es-AR");
   const numero = datosTicket.numero ? `Ticket N° ${esc(datosTicket.numero)}` : "Ticket";
+  let htmlItems = "";
+
+  for (const item of datosTicket.items) {
+    htmlItems += `
+      <div class="d-flex justify-content-between gap-3 mb-1">
+        <span>${item.cantidad} x ${esc(item.nombre)}</span>
+        <span class="text-nowrap">${formatearPrecio(item.cantidad * item.precio)}</span>
+      </div>`;
+  }
 
   document.getElementById("ticket").innerHTML = `
     <div class="text-center mb-3">
@@ -22,14 +31,7 @@ function render() {
       <div>Fecha: ${esc(fecha)}</div>
     </div>
     <hr />
-    ${datosTicket.items
-      .map(
-        (i) => `<div class="d-flex justify-content-between gap-3 mb-1">
-          <span>${i.cantidad} x ${esc(i.nombre)}</span>
-          <span class="text-nowrap">${formatearPrecio(i.cantidad * i.precio)}</span>
-        </div>`
-      )
-      .join("")}
+    ${htmlItems}
     <hr />
     <div class="d-flex justify-content-between fs-5 fw-bold">
       <span>TOTAL</span><span>${formatearPrecio(datosTicket.total)}</span>
@@ -38,39 +40,64 @@ function render() {
 }
 
 function descargarPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit: "mm", format: [80, 70 + datosTicket.items.length * 7] });
-  let y = 12;
+  const jsPDF = window.jspdf.jsPDF;
+  const ancho = 80;
+  const alto = 70 + datosTicket.items.length * 7;
+  const documento = new jsPDF({ unit: "mm", format: [ancho, alto] });
+  let posicionY = 12;
 
-  doc.setFontSize(14);
-  doc.text(datosTicket.empresa, 40, y, { align: "center" });
-  doc.setFontSize(9);
-  y += 6;
+  // Encabezado del ticket
+  documento.setFontSize(14);
+  documento.text(datosTicket.empresa, 40, posicionY, { align: "center" });
+  documento.setFontSize(9);
+  posicionY += 6;
+
   if (datosTicket.numero) {
-    doc.text(`Ticket N° ${datosTicket.numero}`, 40, y, { align: "center" });
+    documento.text(`Ticket N° ${datosTicket.numero}`, 40, posicionY, { align: "center" });
   }
-  y += 8;
-  doc.text(`Cliente: ${datosTicket.cliente}`, 6, y);
-  y += 5;
-  doc.text(`Fecha: ${new Date(datosTicket.fecha).toLocaleString("es-AR")}`, 6, y);
-  y += 4;
-  doc.line(6, y, 74, y);
-  y += 6;
 
-  datosTicket.items.forEach((i) => {
-    doc.text(`${i.cantidad} x ${i.nombre}`.slice(0, 30), 6, y);
-    doc.text(`$${(i.cantidad * i.precio).toFixed(2)}`, 74, y, { align: "right" });
-    y += 6;
-  });
+  posicionY += 8;
+  documento.text(`Cliente: ${datosTicket.cliente}`, 6, posicionY);
+  posicionY += 5;
+  documento.text(
+    `Fecha: ${new Date(datosTicket.fecha).toLocaleString("es-AR")}`,
+    6,
+    posicionY
+  );
+  posicionY += 4;
+  documento.line(6, posicionY, 74, posicionY);
+  posicionY += 6;
 
-  doc.line(6, y, 74, y);
-  y += 7;
-  doc.setFontSize(12);
-  doc.text("TOTAL", 6, y);
-  doc.text(`$${Number(datosTicket.total).toFixed(2)}`, 74, y, { align: "right" });
+  // Una línea por cada producto
+  for (const item of datosTicket.items) {
+    const nombreProducto = `${item.cantidad} x ${item.nombre}`.slice(0, 30);
+    const subtotal = (item.cantidad * item.precio).toFixed(2);
 
-  doc.save(`ticket-${datosTicket.numero ?? Date.now()}.pdf`);
+    documento.text(nombreProducto, 6, posicionY);
+    documento.text(`$${subtotal}`, 74, posicionY, { align: "right" });
+    posicionY += 6;
+  }
+
+  // Total y descarga del archivo
+  documento.line(6, posicionY, 74, posicionY);
+  posicionY += 7;
+  documento.setFontSize(12);
+  documento.text("TOTAL", 6, posicionY);
+  documento.text(`$${Number(datosTicket.total).toFixed(2)}`, 74, posicionY, { align: "right" });
+
+  let numeroArchivo = datosTicket.numero;
+  if (numeroArchivo === null || numeroArchivo === undefined) {
+    numeroArchivo = Date.now();
+  }
+  documento.save(`ticket-${numeroArchivo}.pdf`);
 }
 
-document.getElementById("btn-pdf")?.addEventListener("click", descargarPDF);
-document.getElementById("btn-salir")?.addEventListener("click", reiniciarSistema);
+const botonPDF = document.getElementById("btn-pdf");
+if (botonPDF) {
+  botonPDF.addEventListener("click", descargarPDF);
+}
+
+const botonSalir = document.getElementById("btn-salir");
+if (botonSalir) {
+  botonSalir.addEventListener("click", reiniciarSistema);
+}

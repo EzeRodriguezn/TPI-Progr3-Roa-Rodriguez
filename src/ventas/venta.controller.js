@@ -2,12 +2,24 @@ const ExcelJS = require("exceljs");
 const sequelize = require("../database/sequelize");
 const { Usuario, Venta, Producto, ProductoVentas } = require("../database/relaciones");
 
+// Se calcula en centavos para evitar errores de redondeo con decimales.
+const convertirPrecioACentavos = (precio, idProducto) => {
+  const texto = String(precio);
+  if (!/^\d+(?:\.\d{1,2})?$/.test(texto)) {
+    throw new Error(`Precio inválido para el producto ${idProducto}`);
+  }
+
+  const [pesos, centavos = ""] = texto.split(".");
+  return Number(pesos) * 100 + Number(centavos.padEnd(2, "0"));
+};
+
 const registrarVentaAPI = async (req, res) => {
   try {
     const body = req.body || {};
     const idUsuario = Number(body.idUsuario ?? 1);
     const carrito = body.carrito;
 
+    // Primero validamos los datos recibidos.
     if (!Number.isSafeInteger(idUsuario) || idUsuario <= 0) {
       return res.status(400).json({ error: "idUsuario debe ser un entero positivo" });
     }
@@ -49,25 +61,17 @@ const registrarVentaAPI = async (req, res) => {
         return { status: 400, error: "El carrito contiene productos inexistentes o inactivos" };
       }
 
+      // Validamos todos los precios y stocks antes de modificar la base de datos.
       let totalCentavos = 0;
       const detalles = [];
-
-      // Recorremos los productos para calcular totales, validar y descontar el stock
       for (const producto of productos) {
-        const precio = String(producto.precio);
-        if (!/^\d+(?:\.\d{1,2})?$/.test(precio)) {
-          throw new Error(`Precio inválido para el producto ${producto.id}`);
-        }
-
-        const [entero, decimales = ""] = precio.split(".");
-        const precioCentavos = Number(entero) * 100 + Number(decimales.padEnd(2, "0"));
+        const precioCentavos = convertirPrecioACentavos(producto.precio, producto.id);
         const cantidad = cantidades.get(producto.id);
 
-        // 1. Validar que haya stock suficiente antes de procesar la venta
         if (producto.stock < cantidad) {
-          return { 
-            status: 400, 
-            error: `Stock insuficiente para el producto: ${producto.nombre}. Stock actual: ${producto.stock}, Solicitado: ${cantidad}` 
+          return {
+            status: 400,
+            error: `Stock insuficiente para el producto: ${producto.nombre}. Stock actual: ${producto.stock}, Solicitado: ${cantidad}`,
           };
         }
 
@@ -76,11 +80,13 @@ const registrarVentaAPI = async (req, res) => {
           return { status: 400, error: "El total de la venta excede el máximo permitido" };
         }
 
-        // 2. Descontar el stock en la base de datos
-        const nuevoStock = producto.stock - cantidad;
-        await producto.update({ stock: nuevoStock }, { transaction });
-
         detalles.push({ producto, cantidad, precio: (precioCentavos / 100).toFixed(2) });
+      }
+
+      // Si todas las validaciones pasaron, descontamos el stock.
+      for (const detalle of detalles) {
+        const nuevoStock = detalle.producto.stock - detalle.cantidad;
+        await detalle.producto.update({ stock: nuevoStock }, { transaction });
       }
 
       const nuevaVenta = await Venta.create({
