@@ -113,22 +113,6 @@ const reactivarProducto = async (req, res) => {
   }
 };
 
-const eliminarProducto = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const producto = await Producto.findByPk(id);
-    
-    if (!producto) {
-      return res.status(404).send("Producto no encontrado");
-    }
-
-    await producto.destroy();
-    res.redirect("/productos");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al eliminar el producto (puede estar asociado a ventas)");
-  }
-};
 
 const traerProductosAPI = async (req, res) => {
   try {
@@ -151,7 +135,6 @@ module.exports = {
   crearProducto,
   modificarProductoPorId,
   desactivarProducto,
-  reactivarProducto,
-  eliminarProducto, 
+  reactivarProducto, 
   traerProductosAPI,
 };
