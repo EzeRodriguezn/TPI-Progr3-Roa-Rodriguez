@@ -10,6 +10,7 @@ const {
   modificarProductoPorId,
   desactivarProducto,
   reactivarProducto,
+  eliminarProducto,
   traerProductosAPI,
 } = require("./producto.controller");
 
@@ -24,5 +25,6 @@ router.post("/nuevo", protegerRuta, subidaArchivos.single("imagen"), crearProduc
 router.post("/editar/:id", protegerRuta, subidaArchivos.single("imagen"), modificarProductoPorId);
 router.post("/desactivar/:id", protegerRuta, desactivarProducto);
 router.post("/reactivar/:id", protegerRuta, reactivarProducto);
+router.post("/eliminar/:id", protegerRuta, eliminarProducto);
 
 module.exports = router;

@@ -1,7 +1,6 @@
 const { Producto } = require("../database/relaciones");
 const categoriasPermitidas = new Set(["Perifericos", "Sillas"]);
 
-// 1. Mostrar la tabla con todos los productos (Renderiza EJS)
 const traerProductos = async (req, res) => {
   try {
     const productos = await Producto.findAll({ order: [["nombre", "ASC"]] });
@@ -12,12 +11,10 @@ const traerProductos = async (req, res) => {
   }
 };
 
-// 2. Mostrar el formulario vacío para crear (Renderiza EJS)
 const mostrarFormularioNuevo = (req, res) => {
   res.render("productos/formulario");
 };
 
-// 3. Mostrar el formulario con los datos cargados para editar (Renderiza EJS)
 const mostrarFormularioEdicion = async (req, res) => {
   try {
     const id = req.params.id;
@@ -34,7 +31,6 @@ const mostrarFormularioEdicion = async (req, res) => {
   }
 };
 
-// 4. Procesar la creación del producto
 const crearProducto = async (req, res) => {
   try {
     const { nombre, precio, stock, categoria, subcategoria } = req.body;
@@ -42,7 +38,7 @@ const crearProducto = async (req, res) => {
       return res.status(400).send("La categoría debe ser periféricos o sillas");
     }
 
-    const imagen = req.file ? req.file.filename : 'default.png';
+    const imagen = req.file ? req.file.filename : "default.png";
 
     await Producto.create({
       nombre,
@@ -51,7 +47,7 @@ const crearProducto = async (req, res) => {
       categoria,
       subcategoria,
       imagen,
-      activo: true 
+      activo: true,
     });
 
     res.redirect("/productos");
@@ -70,7 +66,8 @@ const modificarProductoPorId = async (req, res) => {
       return res.status(400).send("La categoría debe ser periféricos o sillas");
     }
 
-    let datosAModificar = {};
+    // Solo se cambian los campos que llegaron en la solicitud.
+    const datosAModificar = {};
 
     if (nombre !== undefined) datosAModificar.nombre = nombre;
     if (precio !== undefined) datosAModificar.precio = precio;
@@ -116,22 +113,6 @@ const reactivarProducto = async (req, res) => {
   }
 };
 
-const eliminarProducto = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const producto = await Producto.findByPk(id);
-    
-    if (!producto) {
-      return res.status(404).send("Producto no encontrado");
-    }
-
-    await producto.destroy();
-    res.redirect("/productos");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al eliminar el producto (puede estar asociado a ventas)");
-  }
-};
 
 const traerProductosAPI = async (req, res) => {
   try {
@@ -154,7 +135,6 @@ module.exports = {
   crearProducto,
   modificarProductoPorId,
   desactivarProducto,
-  reactivarProducto,
-  eliminarProducto, 
+  reactivarProducto, 
   traerProductosAPI,
 };

@@ -1,7 +1,6 @@
 const path = require("path");
 const express = require("express");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 const productoRouter = require("./productos/producto.routes");
@@ -10,7 +9,7 @@ const ventaRouter = require("./ventas/venta.routes");
 const sequelize = require("./database/sequelize");
 require("./database/relaciones");
 const manejadorErrores = require("./middleware/errores");
-const { protegerRuta } = require("./middleware/autenticacion");
+const { cargarAutenticacion, protegerRuta } = require("./middleware/autenticacion");
 
 const app = express();
 const cookieSecret = process.env.COOKIE_SECRET;
@@ -25,11 +24,7 @@ const origenesConfigurados = (process.env.CORS_ORIGINS || "")
   .filter(Boolean);
 
 app.set("trust proxy", process.env.NODE_ENV === "production");
-app.use(cookieParser(cookieSecret));
-app.use((req, res, next) => {
-  res.locals.adminLogueado = req.signedCookies.adminLogueado === "true";
-  next();
-});
+app.use(cargarAutenticacion);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(

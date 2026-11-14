@@ -1,13 +1,18 @@
 const bcrypt = require("bcryptjs");
 const { Usuario } = require("../database/relaciones");
+const { establecerCookieAdmin, limpiarCookieAdmin } = require("../middleware/autenticacion");
 
-// Actualizamos los atributos para que coincidan con tu base de datos real
 const publicUserAttributes = ["id", "username", "rol", "createdAt", "updatedAt"];
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const idValido = (valor) => {
+  const id = Number(valor);
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+};
+
 const crearUsuario = async (req, res, next) => {
   const body = req.body || {};
-  // Si envían "email" por costumbre, lo tomamos como "username"
+  // También aceptamos "email" para mantener compatibilidad con otros formularios.
   const username = body.username ?? body.email; 
   const { password, rol } = body;
 
@@ -43,7 +48,7 @@ const crearUsuario = async (req, res, next) => {
 const procesarLogin = async (req, res) => {
   try {
     const body = req.body || {};
-    // Reemplazamos la búsqueda por email por username
+    // El login acepta el mismo alias que el alta de usuarios.
     const username = body.username ?? body.email;
     const { password } = body;
     const usuario = await Usuario.findOne({ where: { username } });
@@ -52,10 +57,7 @@ const procesarLogin = async (req, res) => {
       return res.status(401).render("login", { error: "Credenciales incorrectas" });
     }
 
-    res.cookie("adminLogueado", "true", {
-      signed: true,
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+    establecerCookieAdmin(res);
     res.redirect("/dashboard");
   } catch (error) {
     console.error("Error en el login:", error);
@@ -64,7 +66,7 @@ const procesarLogin = async (req, res) => {
 };
 
 const cerrarSesion = (req, res) => {
-  res.clearCookie("adminLogueado");
+  limpiarCookieAdmin(res);
   res.redirect("/login");
 };
 
@@ -77,8 +79,8 @@ const traerUsuarios = async (req, res) => {
 };
 
 const traerUsuarioPorId = async (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isSafeInteger(id) || id <= 0) {
+  const id = idValido(req.params.id);
+  if (!id) {
     return res.status(400).json({ error: "El id debe ser un entero positivo" });
   }
 
@@ -90,10 +92,10 @@ const traerUsuarioPorId = async (req, res) => {
 };
 
 const modificarUsuarioPorId = async (req, res, next) => {
-  const id = Number(req.params.id);
+  const id = idValido(req.params.id);
   const body = req.body || {};
 
-  if (!Number.isSafeInteger(id) || id <= 0) {
+  if (!id) {
     return res.status(400).json({ error: "El id debe ser un entero positivo" });
   }
 
@@ -149,8 +151,8 @@ const modificarUsuarioPorId = async (req, res, next) => {
 };
 
 const eliminarUsuarioPorId = async (req, res, next) => {
-  const id = Number(req.params.id);
-  if (!Number.isSafeInteger(id) || id <= 0) {
+  const id = idValido(req.params.id);
+  if (!id) {
     return res.status(400).json({ error: "El id debe ser un entero positivo" });
   }
 

@@ -24,7 +24,11 @@ function render() {
   elContenido.classList.toggle("d-none", vacio);
   if (vacio) return;
 
-  lista.innerHTML = carrito.map(filaItem).join("");
+  let htmlItems = "";
+  for (const item of carrito) {
+    htmlItems += filaItem(item);
+  }
+  lista.innerHTML = htmlItems;
   document.getElementById("resumen-cantidad").textContent = contarItemsCarrito();
   document.getElementById("resumen-total").textContent = formatearPrecio(calcularTotalCarrito());
 }
@@ -79,7 +83,7 @@ lista.addEventListener("click", (ev) => {
       if (item.cantidad < (Number(item.stock) || 0)) actualizarCantidadCarrito(id, 1);
       break;
     case "menos":
-    case "eliminar": // <-- Tanto el botón menos como el tacho ejecutan la resta de a 1 unidad
+    case "eliminar": // Ambos botones quitan una unidad.
       actualizarCantidadCarrito(id, -1); 
       break;
   }
@@ -113,25 +117,40 @@ async function confirmarCompra() {
     const fecha = new Date().toISOString();
     const total = calcularTotalCarrito();
     const nombreCliente = getNombreCliente();
+    const productosVenta = [];
+    const itemsTicket = [];
 
-    const venta = {
-      nombreCliente,
-      fecha,
-      total,
-      carrito: carrito.map((i) => ({
-        idProducto: i.id, 
-        cantidad: i.cantidad,
-        precioUnitario: Number(i.precio),
-      })),
-    };
+    // La API y el ticket necesitan datos distintos de cada producto.
+    for (const item of carrito) {
+      productosVenta.push({
+        idProducto: item.id,
+        cantidad: item.cantidad,
+        precioUnitario: Number(item.precio),
+      });
+      itemsTicket.push({
+        nombre: item.nombre,
+        cantidad: item.cantidad,
+        precio: Number(item.precio),
+      });
+    }
+
+    const venta = { nombreCliente, fecha, total, carrito: productosVenta };
     const respuesta = await registrarVentaAPI(venta);
 
+    // La respuesta puede traer el número directamente o dentro de "venta".
+    let numeroVenta = null;
+    if (respuesta && respuesta.id !== undefined && respuesta.id !== null) {
+      numeroVenta = respuesta.id;
+    } else if (respuesta && respuesta.venta && respuesta.venta.id !== undefined) {
+      numeroVenta = respuesta.venta.id;
+    }
+
     guardarTicket({
-      numero: respuesta?.id ?? respuesta?.venta?.id ?? null,
+      numero: numeroVenta,
       empresa: CONFIG.NOMBRE_EMPRESA,
       cliente: nombreCliente,
       fecha,
-      items: carrito.map((i) => ({ nombre: i.nombre, cantidad: i.cantidad, precio: Number(i.precio) })),
+      items: itemsTicket,
       total,
     });
     vaciarCarrito();
