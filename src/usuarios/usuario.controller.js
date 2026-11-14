@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { Usuario } = require("../database/relaciones");
+const { establecerCookieAdmin, limpiarCookieAdmin } = require("../middleware/autenticacion");
 
 // Actualizamos los atributos para que coincidan con tu base de datos real
 const publicUserAttributes = ["id", "username", "rol", "createdAt", "updatedAt"];
@@ -52,10 +53,7 @@ const procesarLogin = async (req, res) => {
       return res.status(401).render("login", { error: "Credenciales incorrectas" });
     }
 
-    res.cookie("adminLogueado", "true", {
-      signed: true,
-      maxAge: 1000 * 60 * 60 * 24,
-    });
+    establecerCookieAdmin(res);
     res.redirect("/dashboard");
   } catch (error) {
     console.error("Error en el login:", error);
@@ -64,7 +62,7 @@ const procesarLogin = async (req, res) => {
 };
 
 const cerrarSesion = (req, res) => {
-  res.clearCookie("adminLogueado");
+  limpiarCookieAdmin(res);
   res.redirect("/login");
 };
 
